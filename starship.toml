@@ -1,0 +1,93 @@
+# Starship configuration
+# Tema: Tokyo Night (modificato)
+# Font richiesto: MesloLGS NF o JetBrainsMono Nerd Font
+
+# Timeout for commands (in milliseconds)
+command_timeout = 500
+
+# Format of the prompt
+format = """
+$username$directory$git_branch$git_status$python
+$character"""
+
+# Prompt character (Tokyo Night theme - no bold)
+[character]
+success_symbol = "[❯](#9ece6a)"  # Tokyo Night green
+error_symbol = "[❯](#f7768e)"     # Tokyo Night red
+
+# Username (white text with Linux icon)
+[username]
+style_user = "white"
+style_root = "#f7768e"   # Tokyo Night red
+format = "\uf303 [$user]($style) "
+disabled = false
+show_always = true
+
+# Directory (white text)
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+format = "[$read_only]($read_only_style)[$path]($style) "
+style = "white"
+read_only = " 󰌾"
+home_symbol = "~"
+
+# Git branch (with proper git icon)
+[git_branch]
+symbol = "\ue0a0 "
+format = "[\uf1d3 $symbol$branch]($style) "
+style = "#bb9af7"  # Tokyo Night purple
+
+# Git status (detailed icons)
+[git_status]
+format = '([$all_status$ahead_behind]($style) )'
+style = "#f7768e"  # Tokyo Night red
+conflicted = "\uf0ec "
+ahead = "\uf0aa${count} "
+behind = "\uf0ab${count} "
+diverged = "\uf0ec \uf0aa${ahead_count}\uf0ab${behind_count} "
+untracked = "\uf128 "
+stashed = "\uf448 "
+modified = "\uf040 "
+staged = "\uf00c${count} "
+renamed = "\uf02b "
+deleted = "\uf05e "
+
+# Programming languages (shown only when relevant)
+[nodejs]
+symbol = " "
+format = "via [$symbol($version )]($style)"
+
+[python]
+symbol = "\ue73c "
+format = "[$symbol]($style)[($virtualenv )]($style)"
+style = "#e0af68"  # Tokyo Night yellow
+detect_extensions = ["py"]
+detect_files = [".python-version", "Pipfile", "requirements.txt", "pyproject.toml", "setup.py"]
+detect_folders = []
+
+[rust]
+symbol = " "
+format = "via [$symbol($version )]($style)"
+
+[golang]
+symbol = " "
+format = "via [$symbol($version )]($style)"
+
+[php]
+symbol = " "
+format = "via [$symbol($version )]($style)"
+
+[java]
+symbol = " "
+format = "via [$symbol($version )]($style)"
+
+# Command duration (Tokyo Night theme - no bold)
+[cmd_duration]
+min_time = 2000
+format = "took [$duration]($style) "
+style = "#e0af68"  # Tokyo Night yellow
+
+# Time
+[time]
+disabled = true
