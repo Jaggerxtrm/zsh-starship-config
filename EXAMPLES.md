@@ -133,7 +133,7 @@
 | ⬇️ | \uf0ab | Behind |
 | ⚠️ | \uf0ec | Diverged/Conflicts |
 | 📦 | \uf448 | Stash |
-| ⮕ | - | Prompt (verde=ok, rosso=errore) |
+| ⮕ | - | Prompt character (blu=ok, rosso=errore) |
 
 ## Test Manuale
 
