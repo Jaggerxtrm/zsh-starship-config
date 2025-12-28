@@ -14,14 +14,14 @@ Il prompt mostra:
 Esempio:
 ```
  dawid ~/projects/my-repo  main  venv
-❯
+⮕
 ```
 
 ## ✨ Caratteristiche
 
 ### Prompt (Starship)
-- **Tema**: Tokyo Night (modificato)
-- **Colori**: Testo bianco per username e directory, colori custom per git e linguaggi
+- **Tema**: Ocean Blue + Tokyo Night (ibrido personalizzato)
+- **Colori**: Testo bianco per username e directory, palette Ocean Blue per comandi
 - **Git**: Icone dettagliate per ogni stato (modified, staged, untracked, ahead, behind, conflicts, etc.)
 - **Linguaggi**: Rileva automaticamente Python, Node.js, Rust, Go, PHP, Java
 - **Performance**: Timeout 500ms, prompt veloce e reattivo
@@ -166,9 +166,21 @@ style = "#f7768e"  # Rosso Tokyo Night
 # Python/Linguaggi
 style = "#e0af68"  # Giallo Tokyo Night
 
-# Prompt character
-success_symbol = "[❯](#9ece6a)"  # Verde
-error_symbol = "[❯](#f7768e)"    # Rosso
+# Prompt character (Ocean Blue)
+success_symbol = "[⮕](#61afef)"  # Blu chiaro
+error_symbol = "[⮕](#e06c75)"    # Rosso soft
+```
+
+### Syntax Highlighting (Ocean Blue)
+
+I colori della sintassi mentre digiti sono configurati con palette Ocean Blue:
+
+```bash
+ZSH_HIGHLIGHT_STYLES[command]='fg=#61afef'        # Comandi: blu chiaro
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#e06c75'  # Errori: rosso soft
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=#56b6c2'        # Built-in: cyan
+ZSH_HIGHLIGHT_STYLES[alias]='fg=#528bff'          # Alias: blu elettrico
+ZSH_HIGHLIGHT_STYLES[path]='fg=#89b4fa'           # Path: azzurro
 ```
 
 ### Icone Nerd Font

@@ -58,6 +58,15 @@ echo "\uf1d3 \ue0a0 \ue73c \uf303"
 
 Dovresti vedere: 🐙 🌿 🐍 🐧
 
+### 4. Test Syntax Highlighting
+
+Digita un comando (senza premere invio):
+```bash
+ls -la
+```
+
+Dovresti vedere `ls` in **blu chiaro** e `-la` in **azzurro**. Se digiti un comando inesistente, apparirà in **rosso**.
+
 ## Test Completo
 
 ```bash
@@ -66,7 +75,7 @@ cd ~/projects/qualche-repo
 
 # Dovresti vedere:
 #  dawid ~/projects/qualche-repo  main
-# ❯
+# ⮕
 
 # Fai modifiche per testare git status
 touch test.txt

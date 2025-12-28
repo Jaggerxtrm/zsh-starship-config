@@ -175,6 +175,19 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+# Syntax highlighting colors - Ocean Blue theme
+ZSH_HIGHLIGHT_STYLES[command]='fg=#61afef'                      # Comandi validi: blu chiaro
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#e06c75'                # Non validi: rosso soft
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=#56b6c2'                      # Built-in: cyan
+ZSH_HIGHLIGHT_STYLES[alias]='fg=#528bff'                        # Alias: blu elettrico
+ZSH_HIGHLIGHT_STYLES[path]='fg=#89b4fa,underline'               # Path: azzurro
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=#74c7ec'                     # Glob: acqua
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=#82aaff'                   # sudo, time: blu intenso
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#7dcfff'       # 'stringa': cyan brillante
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#7dcfff'       # "stringa": cyan brillante
+ZSH_HIGHLIGHT_STYLES[redirection]='fg=#4fc1ff'                  # >, <, |: blu cielo
+ZSH_HIGHLIGHT_STYLES[comment]='fg=#5c6370,italic'               # # commenti: grigio
+
 # FZF integration (se disponibile)
 if [ -f /usr/share/fzf/shell/key-bindings.zsh ]; then
     source /usr/share/fzf/shell/key-bindings.zsh

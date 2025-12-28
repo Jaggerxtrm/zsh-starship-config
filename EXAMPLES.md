@@ -5,114 +5,114 @@
 ### 1. Home Directory
 ```
  dawid ~
-❯
+⮕
 ```
 
 ### 2. In una Repository Git
 ```
  dawid ~/projects/my-app  main
-❯
+⮕
 ```
 
 ### 3. Git con Modifiche Non Staged
 ```
  dawid ~/projects/my-app  main  ✏️
-❯
+⮕
 ```
 
 ### 4. Git con File Staged
 ```
  dawid ~/projects/my-app  main  ✅2
-❯
+⮕
 ```
 
 ### 5. Git Ahead (commit da pushare)
 ```
  dawid ~/projects/my-app  main  ⬆️3
-❯
+⮕
 ```
 
 ### 6. Git Behind (commit da pullare)
 ```
  dawid ~/projects/my-app  main  ⬇️2
-❯
+⮕
 ```
 
 ### 7. Git Branch Divergenti
 ```
  dawid ~/projects/my-app  main  ⚠️ ⬆️2⬇️1
-❯
+⮕
 ```
 
 ### 8. Progetto Python con Virtual Environment
 ```
  dawid ~/projects/my-api  main  (venv)
-❯
+⮕
 ```
 
 ### 9. Progetto Python con Modifiche Git
 ```
  dawid ~/projects/my-api  main  ✏️2 ✅1  (venv)
-❯
+⮕
 ```
 
 ### 10. Multiple Languages Detected
 ```
  dawid ~/projects/fullstack  main  📦 v18.0.0  (venv)
-❯
+⮕
 ```
 
 ### 11. Comando che Richiede Tempo
 ```
  dawid ~/projects/my-app  main
-❯ npm run build
+⮕ npm run build
 # ... dopo il comando
  dawid ~/projects/my-app  main took 12s
-❯
+⮕
 ```
 
 ### 12. Comando Fallito (Exit Code != 0)
 ```
  dawid ~/projects/my-app  main
-❯ exit 1
+⮕ exit 1
  dawid ~/projects/my-app  main
-❯  # Freccia rossa indica errore
+⮕  # Freccia rossa indica errore
 ```
 
 ### 13. File Untracked in Git
 ```
  dawid ~/projects/my-app  main  ❓3
-❯
+⮕
 ```
 
 ### 14. File Rinominati
 ```
  dawid ~/projects/my-app  main  📝2
-❯
+⮕
 ```
 
 ### 15. File Cancellati
 ```
  dawid ~/projects/my-app  main  🗑️1
-❯
+⮕
 ```
 
 ### 16. Con Stash Attivo
 ```
  dawid ~/projects/my-app  main  📦
-❯
+⮕
 ```
 
 ### 17. Conflitti Git (Merge/Rebase)
 ```
  dawid ~/projects/my-app  main  ⚠️
-❯
+⮕
 ```
 
 ### 18. Tutto Insieme (Scenario Reale)
 ```
  dawid ~/projects/api-service  feature/auth  ⬆️2 ✏️5 ✅3 ❓1  (venv) took 3s
-❯
+⮕
 ```
 
 ## Legenda Icone
@@ -133,7 +133,7 @@
 | ⬇️ | \uf0ab | Behind |
 | ⚠️ | \uf0ec | Diverged/Conflicts |
 | 📦 | \uf448 | Stash |
-| ❯ | - | Prompt (verde=ok, rosso=errore) |
+| ⮕ | - | Prompt (verde=ok, rosso=errore) |
 
 ## Test Manuale
 
@@ -193,7 +193,7 @@ sleep 3
 ```bash
 # Comando che fallisce
 false
-# Freccia ❯ diventa ROSSA
+# Freccia ⮕ diventa ROSSA
 ```
 
 ## Tips per Screenshot

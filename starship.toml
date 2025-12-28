@@ -1,5 +1,5 @@
 # Starship configuration
-# Tema: Tokyo Night (modificato)
+# Tema: Ocean Blue + Tokyo Night (ibrido personalizzato)
 # Font richiesto: MesloLGS NF o JetBrainsMono Nerd Font
 
 # Timeout for commands (in milliseconds)
@@ -10,10 +10,10 @@ format = """
 $username$directory$git_branch$git_status$python
 $character"""
 
-# Prompt character (Tokyo Night theme - no bold)
+# Prompt character (Ocean Blue theme)
 [character]
-success_symbol = "[❯](#9ece6a)"  # Tokyo Night green
-error_symbol = "[❯](#f7768e)"     # Tokyo Night red
+success_symbol = "[⮕](#61afef)"  # Ocean Blue: blu chiaro
+error_symbol = "[⮕](#e06c75)"     # Ocean Blue: rosso soft
 
 # Username (white text with Linux icon)
 [username]
