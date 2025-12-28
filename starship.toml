@@ -19,7 +19,7 @@ error_symbol = "[❯](#f7768e)"     # Tokyo Night red
 [username]
 style_user = "white"
 style_root = "#f7768e"   # Tokyo Night red
-format = "\uf303 [$user]($style) "
+format = "\uf17c [$user]($style) "
 disabled = false
 show_always = true
 

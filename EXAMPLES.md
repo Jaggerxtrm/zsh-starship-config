@@ -119,7 +119,7 @@
 
 | Icona | Codice | Significato |
 |-------|---------|-------------|
-| 🐧 | \uf303 | Fedora Linux |
+| 🐧 | \uf17c | Linux (Tux) |
 | 🐙 | \uf1d3 | GitHub Repository |
 | 🌿 | \ue0a0 | Git Branch |
 | 🐍 | \ue73c | Python |

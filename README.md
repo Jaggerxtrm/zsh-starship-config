@@ -218,8 +218,10 @@ format = "[$symbol($version )]($style)[($virtualenv )]($style)"
 
 ### Cambiare Icona Linux
 
+La configurazione usa Tux generico (\uf17c). Puoi cambiarla:
+
 ```toml
-# Tux generico
+# Tux generico (default)
 format = "\uf17c [$user]($style) "
 
 # Logo Fedora
