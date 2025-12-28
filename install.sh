@@ -205,7 +205,8 @@ if command -v eza &> /dev/null; then
     alias ls='eza --icons --group-directories-first'
     alias ll='eza -l --icons --group-directories-first'
     alias la='eza -la --icons --group-directories-first'
-    alias lt='eza --tree --icons --group-directories-first'
+    alias lt='eza --tree --icons --group-directories-first --git-ignore --ignore-glob="venv|.venv|env|.env|node_modules|.git"'
+    alias lta='eza --tree --icons --group-directories-first'  # tree ALL (senza esclusioni)
 fi
 
 if command -v bat &> /dev/null; then
