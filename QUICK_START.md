@@ -148,9 +148,17 @@ starship module python
 
 # Info versione
 starship --version
+eza --version
 
 # Lista font installati
 fc-list | grep Nerd
+
+# Alias disponibili
+ls    # lista con icone
+ll    # lista dettagliata
+la    # lista con file nascosti
+lt    # tree (esclude venv, node_modules)
+lta   # tree completo
 ```
 
 ## Prossimi Passi

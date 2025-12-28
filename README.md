@@ -36,12 +36,16 @@ Esempio:
   - `command-not-found` - Suggerimenti per comandi non trovati
 
 ### Strumenti Moderni (opzionali)
-- **eza** - `ls` moderno con icone
+- **eza** - `ls` moderno con icone (installato automaticamente)
 - **bat** - `cat` con syntax highlighting
 - **ripgrep** - `grep` velocissimo
 - **fd** - `find` user-friendly
 - **zoxide** - `cd` intelligente con memoria
 - **fzf** - Fuzzy finder interattivo
+
+**Alias intelligenti:**
+- `lt` - tree che esclude venv, node_modules, .git
+- `lta` - tree completo senza esclusioni
 
 ## 📋 Requisiti
 
@@ -66,8 +70,9 @@ Lo script installerà automaticamente:
 3. ✅ Plugin Zsh (autosuggestions, syntax-highlighting, etc.)
 4. ✅ Starship
 5. ✅ Nerd Fonts (MesloLGS NF + JetBrainsMono)
-6. ✅ Configurazione custom
-7. ⚙️ Strumenti moderni (opzionale)
+6. ✅ eza (modern ls con icone)
+7. ✅ Configurazione custom
+8. ⚙️ Strumenti moderni extra (opzionale)
 
 ### Installazione Manuale
 

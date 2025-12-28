@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.2.0 - 2024-12-28
+
+### Nuove Funzionalità
+- 📁 **Installazione automatica eza** da GitHub releases
+- 🌳 **Tree intelligente**: `lt` esclude venv, node_modules, .git
+- 📋 Nuovo alias `lta` per tree completo
+- 🔧 Script install.sh migliorato con fallback per eza
+
+### Miglioramenti
+- Icona untracked cambiata a `\uf059` (? cerchiato più compatto)
+- Documentazione aggiornata con nuovi alias
+
 ## v1.1.0 - 2024-12-28
 
 ### Cambiamenti

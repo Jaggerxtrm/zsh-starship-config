@@ -121,19 +121,54 @@ install_nerd_fonts() {
     fi
 }
 
+# Installa eza
+install_eza() {
+    echo -e "\n📁 Installazione eza (modern ls)..."
+
+    if command -v eza &> /dev/null; then
+        echo "✓ eza già installato ($(eza --version | head -1))"
+        return
+    fi
+
+    # Prova prima dai repo
+    if [ "$OS" = "fedora" ]; then
+        echo "Tentativo installazione da Copr..."
+        if sudo dnf copr enable -y atim/eza 2>/dev/null && sudo dnf install -y eza 2>/dev/null; then
+            echo "✓ eza installato da Copr"
+            return
+        fi
+    fi
+
+    # Fallback: installa da GitHub releases
+    echo "Installazione da GitHub releases..."
+    cd /tmp
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "x86_64" ]; then
+        wget -q https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz
+        tar -xzf eza_x86_64-unknown-linux-gnu.tar.gz
+        mkdir -p "$HOME/.local/bin"
+        mv eza "$HOME/.local/bin/"
+        chmod +x "$HOME/.local/bin/eza"
+        rm eza_x86_64-unknown-linux-gnu.tar.gz
+        echo "✓ eza installato in ~/.local/bin/"
+    else
+        echo "⚠️  Architettura $ARCH non supportata per download automatico"
+        echo "   Installa manualmente da: https://github.com/eza-community/eza/releases"
+    fi
+}
+
 # Installa strumenti moderni (opzionale)
 install_modern_tools() {
     echo -e "\n🛠️  Installazione strumenti moderni (opzionale)..."
 
-    read -p "Vuoi installare eza, bat, ripgrep, fd, zoxide? (s/N) " -n 1 -r
+    read -p "Vuoi installare bat, ripgrep, fd, zoxide? (s/N) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Ss]$ ]]; then
         if [ "$OS" = "fedora" ]; then
-            sudo dnf install -y eza bat ripgrep fd-find zoxide fzf
+            sudo dnf install -y bat ripgrep fd-find zoxide fzf
         elif [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
             sudo apt install -y bat ripgrep fd-find fzf
-            # eza e zoxide potrebbero richiedere repo aggiuntivi su Ubuntu
-            echo "⚠️  Per eza e zoxide su Ubuntu, consulta la documentazione ufficiale"
+            echo "⚠️  Per zoxide su Ubuntu, consulta la documentazione ufficiale"
         fi
     fi
 }
@@ -265,6 +300,7 @@ main() {
     install_zsh_plugins
     install_starship
     install_nerd_fonts
+    install_eza
     install_modern_tools
     apply_starship_config
     configure_zshrc
