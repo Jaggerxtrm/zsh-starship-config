@@ -20,8 +20,8 @@ Esempio:
 ## ✨ Caratteristiche
 
 ### Prompt (Starship)
-- **Tema**: Ocean Blue + Tokyo Night (ibrido personalizzato)
-- **Colori**: Testo bianco per username e directory, palette Ocean Blue per comandi
+- **Tema**: Green Theme + Tokyo Night
+- **Colori**: Testo bianco per username e directory, palette verde coerente per il prompt
 - **Git**: Icone dettagliate per ogni stato (modified, staged, untracked, ahead, behind, conflicts, etc.)
 - **Linguaggi**: Rileva automaticamente Python, Node.js, Rust, Go, PHP, Java
 - **Performance**: Timeout 500ms, prompt veloce e reattivo
@@ -30,7 +30,7 @@ Esempio:
 - **Plugin attivi**:
   - `git` - Alias e funzioni per Git
   - `zsh-autosuggestions` - Suggerimenti mentre digiti
-  - `zsh-syntax-highlighting` - Evidenziazione sintassi comandi
+  - `zsh-syntax-highlighting` - Evidenziazione sintassi comandi (Tema Verde)
   - `zsh-history-substring-search` - Ricerca nell'history
   - `colored-man-pages` - Pagine man colorate
   - `command-not-found` - Suggerimenti per comandi non trovati
@@ -54,6 +54,18 @@ Esempio:
 - Accesso sudo (per installare pacchetti)
 - Terminale con supporto colori 256
 
+## 🪟 Supporto WSL2 (Windows)
+
+Se usi WSL (Windows Subsystem for Linux), lo script rileverà automaticamente l'ambiente.
+
+Poiché Windows Terminal non può leggere i font installati dentro Linux:
+1. Lo script copierà i font nella tua cartella **Download** di Windows (in `NerdFonts_Zsh_Setup`).
+2. Dovrai andare in quella cartella su Windows.
+3. Selezionare i file, **Tasto Destro** → **Installa**.
+4. Configurare Windows Terminal:
+   - Impostazioni → Profili → Ubuntu (o la tua distro) → Aspetto
+   - Tipo di carattere: **MesloLGS NF**
+
 ## 🚀 Installazione Rapida
 
 ### Installazione Automatica
@@ -69,11 +81,11 @@ Lo script installerà automaticamente:
 2. ✅ Oh My Zsh
 3. ✅ Plugin Zsh (autosuggestions, syntax-highlighting, etc.)
 4. ✅ Starship
-5. ✅ Nerd Fonts (MesloLGS NF + JetBrainsMono)
+5. ✅ Nerd Fonts (Meslo, JetBrains, Hack, FiraMono, Cousine)
 6. ✅ eza (modern ls con icone)
 7. ✅ jq (JSON parser per Claude Code)
 8. ✅ Configurazione custom
-9. 🔗 Claude Code Status Line (tema Starship)
+9. 🔗 **Claude Code Status Line Enhanced** (model + usage% + git + venv)
 10. ⚙️ Strumenti moderni extra (opzionale)
 
 ### Installazione Manuale
@@ -133,6 +145,9 @@ tar -xf JetBrainsMono.tar.xz -C ~/.local/share/fonts/JetBrainsMonoNerdFont
 fc-cache -fv
 ```
 
+**Altri Nerd Fonts Inclusi (Hack, FiraMono, Cousine):**
+Puoi installarli in modo simile scaricando `Hack.tar.xz`, `FiraMono.tar.xz` o `Cousine.tar.xz` da [nerd-fonts releases](https://github.com/ryanoasis/nerd-fonts/releases).
+
 #### 6. Applica Configurazione
 ```bash
 # Copia starship config
@@ -156,78 +171,80 @@ source ~/.zshrc
 
 ## 🔗 Integrazione Claude Code Status Line
 
-Claude Code può usare lo **stesso tema Starship** per la sua status line!
+Claude Code può usare lo **stesso tema Starship** per la sua status line, con **funzionalità avanzate**!
 
 ### Configurazione Automatica
 
-```bash
-# Crea la directory se non esiste
-mkdir -p ~/.claude
+Lo script `install.sh` configura automaticamente la status line di Claude Code. La configurazione viene installata in:
+- **Script**: `~/.claude/hooks/statusline-starship.sh`
+- **Config**: `~/.claude/settings.json`
 
-# Crea lo script della status line
-cat > ~/.claude/statusline-command.sh << 'EOF'
-#!/bin/bash
-# Starship-inspired status line for Claude Code
+### Cosa Mostra (Enhanced Version)
 
-# Read JSON input
-input=$(cat)
+La status line Claude Code mostra **tutte queste informazioni in tempo reale**:
 
-# Extract current directory from input
-cwd=$(echo "$input" | jq -r '.workspace.current_dir')
+| Elemento | Descrizione | Esempio |
+|----------|-------------|---------|
+| 🤖 **Model** | Modello Claude attualmente in uso | `Claude 3.5 Sonnet` |
+| 📊 **Usage** | Percentuale di contesto utilizzato | `[15%]` |
+| 👤 **User@Host** | Username e hostname | `dawid@fedora` |
+| 📁 **Directory** | Path corrente (truncato a repo root) | `second-mind` |
+| 🌿 **Git Branch** | Branch Git con icona | ` master` |
+| ✏️ **Git Status** | Modifiche non committate | `` (se dirty) |
+| 🐍 **Python Venv** | Virtual environment attivo | ` (venv)` |
 
-# Get username
-user=$(whoami)
-
-# Get git info if in a git repo
-git_info=""
-if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
-    branch=$(git -C "$cwd" branch --show-current 2>/dev/null || echo "detached")
-
-    # Check for modifications
-    if ! git -C "$cwd" diff-index --quiet HEAD -- 2>/dev/null; then
-        status_icon="\uf040"  # Modified icon
-        git_info=$(printf '\033[35m\uf1d3 \ue0a0 %s\033[0m \033[31m%s\033[0m ' "$branch" "$status_icon")
-    else
-        git_info=$(printf '\033[35m\uf1d3 \ue0a0 %s\033[0m ' "$branch")
-    fi
-fi
-
-# Get Python virtualenv info
-python_info=""
-if [ -n "$VIRTUAL_ENV" ]; then
-    venv_name=$(basename "$VIRTUAL_ENV")
-    python_info=$(printf '\033[33m\ue73c (%s) \033[0m' "$venv_name")
-fi
-
-# Format directory path (replace home with ~)
-display_dir="${cwd/#$HOME/\~}"
-
-# Output status line
-printf '\uf17c %s %s %s%s' "$user" "$display_dir" "$git_info" "$python_info"
-EOF
-
-# Rendi eseguibile
-chmod +x ~/.claude/statusline-command.sh
-
-# Configura Claude Code
-mkdir -p ~/.claude
-echo '{"statusLine": {"command": "~/.claude/statusline-command.sh"}}' > ~/.claude/settings.json
+**Esempio Output Completo:**
+```
+Claude 3.5 Sonnet [15%] dawid@fedora second-mind  master
 ```
 
-### Cosa Mostra
+### Caratteristiche Avanzate
 
-La status line Claude Code mostra:
-- 🐧 Icona Linux + username
-- Directory corrente
-- Branch Git (viola Tokyo Night)
-- Stato modifiche Git (rosso ✗ se dirty)
-- Virtual environment Python (giallo)
+#### 1. **Token Usage in Tempo Reale**
+- Mostra la percentuale di contesto utilizzato `[X%]`
+- Si aggiorna dinamicamente durante la conversazione
+- **Diminuisce automaticamente dopo compaction** del contesto
 
-Stesso look & feel del tuo Starship prompt!
+#### 2. **Model Display**
+- Mostra il modello Claude attualmente in uso (cyan)
+- Utile quando si cambia tra modelli (Sonnet, Opus, Haiku)
+
+#### 3. **Git Intelligence**
+- Directory truncata al repository root (come Starship)
+- Rileva automaticamente modifiche con `core.useBuiltinFSMonitor=false` per evitare lock
+- Icone Nerd Font renderizzate correttamente
+
+#### 4. **Colori Starship-Matched**
+- **Model/Usage**: Cyan (`\033[36m`) - distintivo
+- **Username**: White (`\033[37m`)
+- **Hostname**: Bold Green (`\033[1;32m`)
+- **Directory**: White (`\033[37m`)
+- **Git**: Green (`\033[32m`)
+- **Python Venv**: Yellow (`\033[33m`)
+
+### Configurazione Manuale (se necessario)
+
+Se vuoi installare manualmente o personalizzare:
+
+```bash
+# Copia lo script dal repository
+cp data/claude-statusline-starship.sh ~/.claude/hooks/statusline-starship.sh
+chmod +x ~/.claude/hooks/statusline-starship.sh
+
+# Configura Claude Code (preserva altre impostazioni)
+jq '. + {"statusLine": {"command": "~/.claude/hooks/statusline-starship.sh"}}' \
+    ~/.claude/settings.json > ~/.claude/settings.json.tmp && \
+    mv ~/.claude/settings.json.tmp ~/.claude/settings.json
+```
 
 ### Requisiti
-- `jq` per parsing JSON: `sudo dnf install jq` (Fedora) o `sudo apt install jq` (Ubuntu)
-- Nerd Font installato (già configurato per Starship)
+- ✅ `jq` per parsing JSON (installato automaticamente)
+- ✅ Nerd Font installato (già configurato per Starship)
+- ✅ Git (per funzionalità repository)
+
+### File Sorgente
+
+Lo script completo è disponibile in `data/claude-statusline-starship.sh` nel repository.
 
 ## 🎨 Personalizzazione
 

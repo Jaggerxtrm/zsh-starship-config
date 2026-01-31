@@ -1,5 +1,57 @@
 # Changelog
 
+## v1.7.0 - 2026-01-31
+
+### Nuove Funzionalità
+- 🪟 **Supporto WSL2 Smart**: Rileva automaticamente l'ambiente WSL.
+- 📤 **Auto-Export Font per Windows**: Copia i font scaricati nella cartella `Downloads/NerdFonts_Zsh_Setup` di Windows per facilitare l'installazione manuale sull'host.
+
+## v1.6.0 - 2026-01-31
+
+### Nuove Funzionalità
+- 🔤 **Extended Nerd Fonts Support**: L'installer ora scarica e installa automaticamente anche:
+  - **Hack Nerd Font**
+  - **FiraMono Nerd Font**
+  - **Cousine Nerd Font**
+- 🛠️ **Installazione più robusta**: Migliorata la gestione dei download dei font.
+
+## v1.5.0 - 2026-01-31
+
+### Cambiamenti
+- 🎨 **Nuovo Tema Verde**: Aggiornata la palette colori per maggiore coerenza con Hostname e Git.
+- 🟢 **Prompt Character**: Il simbolo `>` ora è **verde grassetto** (successo) e **rosso grassetto** (errore).
+- 🌈 **Syntax Highlighting Rivisitato**:
+  - **Comandi**: Verde standard (pulito, no bold).
+  - **Path**: Bianco (rimosso underline per leggibilità).
+  - **Alias**: Verde acqua (teal) per distinzione.
+  - **Pre-comandi**: Ciano grassetto per dare enfasi a `sudo` etc.
+  - **Stringhe**: Giallo Tokyo Night (coerente con altri elementi).
+  - **Globbing/Redirection**: Viola soft per contrasto.
+
+## v1.4.0 - 2025-01-31
+
+### Nuove Funzionalità
+- 🤖 **Claude Code Status Line Enhanced**: Versione avanzata con funzionalità real-time
+  - 📊 **Token Usage**: Mostra percentuale contesto utilizzato `[X%]`
+  - 🔄 **Auto-update**: Si aggiorna dinamicamente dopo compaction
+  - 🤖 **Model Display**: Mostra il modello Claude in uso (cyan)
+  - 🎨 **Color-coded**: Colori Starship-matched per coerenza visiva
+- 📁 **Smart Directory Truncation**: Path truncato a repository root (come Starship)
+- 🔧 **Installer Migliorato**: Preserva configurazioni esistenti in settings.json
+
+### File Aggiunti
+- `data/claude-statusline-starship.sh` - Script statusline enhanced nel repository
+- Configurazione automatica in `~/.claude/hooks/statusline-starship.sh`
+
+### Documentazione
+- Sezione "Integrazione Claude Code Status Line" completamente riscritta
+- Nuova tabella con tutte le feature della statusline
+- Esempi di output e caratteristiche avanzate documentate
+
+### Breaking Changes
+- Path statusline cambiato da `~/.claude/statusline-command.sh` a `~/.claude/hooks/statusline-starship.sh`
+- L'installer fa backup automatico di configurazioni esistenti
+
 ## v1.3.0 - 2024-12-30
 
 ### Nuove Funzionalità

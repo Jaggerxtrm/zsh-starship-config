@@ -10,10 +10,10 @@ format = """
 $username$hostname$directory$git_branch$git_status$python
 $character"""
 
-# Prompt character (Ocean Blue theme)
+# Prompt character (Matched to Host/Git)
 [character]
-success_symbol = "[>](#61afef)"   # Ocean Blue: blu chiaro
-error_symbol = "[>](#e06c75)"     # Ocean Blue: rosso soft
+success_symbol = "[>](bold green)"
+error_symbol = "[>](bold red)"
 
 # Username (white text)
 [username]
@@ -27,7 +27,7 @@ show_always = true
 [hostname]
 ssh_only = false          # show always, not just SSH
 format = "[$hostname]($style) "
-style = "#7dcfff"         # Tokyo Night light blue (matches git)
+style = "bold green"      # green for local, you can customize per VPS
 disabled = false
 
 # Directory (white text)
@@ -41,14 +41,13 @@ home_symbol = "home"
 
 # Git branch (with proper git icon)
 [git_branch]
-symbol = "\ue0a0 "
-format = "[\uf1d3 $symbol$branch]($style) "
-style = "#7dcfff"  # Modern light blue
+format = "[\uf09b $branch]($style) "
+style = "green"  # Matches hostname (not bold)
 
 # Git status (detailed icons)
 [git_status]
 format = '([$all_status$ahead_behind]($style) )'
-style = "#7dcfff"  # Modern light blue
+style = "green"  # Matches hostname (not bold)
 conflicted = "\uf0ec "
 ahead = "\uf0aa${count} "
 behind = "\uf0ab${count} "

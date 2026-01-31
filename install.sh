@@ -102,7 +102,6 @@ install_nerd_fonts() {
         wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
         wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
         mv MesloLGS*.ttf "$FONT_DIR/"
-        fc-cache -fv "$FONT_DIR" > /dev/null 2>&1
         echo "✓ MesloLGS NF installato"
     fi
 
@@ -116,8 +115,82 @@ install_nerd_fonts() {
         mkdir -p "$FONT_DIR/JetBrainsMonoNerdFont"
         tar -xf JetBrainsMono.tar.xz -C "$FONT_DIR/JetBrainsMonoNerdFont"
         rm JetBrainsMono.tar.xz
-        fc-cache -fv "$FONT_DIR/JetBrainsMonoNerdFont" > /dev/null 2>&1
         echo "✓ JetBrainsMono Nerd Font installato"
+    fi
+
+    # Hack Nerd Font
+    if fc-list | grep -qi "Hack Nerd Font"; then
+        echo "✓ Hack Nerd Font già installato"
+    else
+        echo "Scaricando Hack Nerd Font..."
+        cd /tmp
+        wget -q https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.tar.xz
+        mkdir -p "$FONT_DIR/HackNerdFont"
+        tar -xf Hack.tar.xz -C "$FONT_DIR/HackNerdFont"
+        rm Hack.tar.xz
+        echo "✓ Hack Nerd Font installato"
+    fi
+
+    # FiraMono Nerd Font
+    if fc-list | grep -qi "FiraMono Nerd Font"; then
+        echo "✓ FiraMono Nerd Font già installato"
+    else
+        echo "Scaricando FiraMono Nerd Font..."
+        cd /tmp
+        wget -q https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraMono.tar.xz
+        mkdir -p "$FONT_DIR/FiraMonoNerdFont"
+        tar -xf FiraMono.tar.xz -C "$FONT_DIR/FiraMonoNerdFont"
+        rm FiraMono.tar.xz
+        echo "✓ FiraMono Nerd Font installato"
+    fi
+
+    # Cousine Nerd Font
+    if fc-list | grep -qi "Cousine Nerd Font"; then
+        echo "✓ Cousine Nerd Font già installato"
+    else
+        echo "Scaricando Cousine Nerd Font..."
+        cd /tmp
+        wget -q https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Cousine.tar.xz
+        mkdir -p "$FONT_DIR/CousineNerdFont"
+        tar -xf Cousine.tar.xz -C "$FONT_DIR/CousineNerdFont"
+        rm Cousine.tar.xz
+        echo "✓ Cousine Nerd Font installato"
+    fi
+
+    # Refresh cache
+    fc-cache -fv "$FONT_DIR" > /dev/null 2>&1
+}
+
+# Gestione Font per WSL (Windows Subsystem for Linux)
+handle_wsl_fonts() {
+    # Verifica se siamo in WSL
+    if grep -qEi "(Microsoft|WSL)" /proc/version; then
+        echo -e "\n🪟 Rilevato ambiente WSL!"
+        echo "I font devono essere installati anche su Windows per essere usati nel Terminale."
+
+        # Trova l'username Windows corrente
+        WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+        
+        if [ -n "$WIN_USER" ]; then
+            WIN_DEST="/mnt/c/Users/$WIN_USER/Downloads/NerdFonts_Zsh_Setup"
+            
+            echo "Copia dei font in Windows ($WIN_DEST)..."
+            mkdir -p "$WIN_DEST"
+            cp "$HOME/.local/share/fonts/"* "$WIN_DEST/" 2>/dev/null || true
+            cp "$HOME/.local/share/fonts/JetBrainsMonoNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
+            cp "$HOME/.local/share/fonts/HackNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
+            cp "$HOME/.local/share/fonts/FiraMonoNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
+            cp "$HOME/.local/share/fonts/CousineNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
+
+            echo ""
+            echo "⚠️  AZIONE RICHIESTA SU WINDOWS:"
+            echo "1. Apri la cartella 'Download/NerdFonts_Zsh_Setup' su Windows"
+            echo "2. Seleziona tutti i file .ttf/.otf"
+            echo "3. Tasto destro -> 'Installa' (o 'Installa per tutti gli utenti')"
+            echo "4. Configura Windows Terminal per usare 'MesloLGS NF'"
+        else
+            echo "⚠️  Impossibile determinare l'utente Windows. Copia manuale richiesta."
+        fi
     fi
 }
 
@@ -183,64 +256,83 @@ install_claude_code_statusline() {
         install_jq
     fi
 
-    # Crea directory Claude
-    mkdir -p "$HOME/.claude"
+    # Crea directory Claude hooks
+    mkdir -p "$HOME/.claude/hooks"
 
-    # Crea lo script della status line
-    cat > "$HOME/.claude/statusline-command.sh" << 'EOF'
+    # Copia lo script della status line dal repository
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "$SCRIPT_DIR/data/claude-statusline-starship.sh" ]; then
+        cp "$SCRIPT_DIR/data/claude-statusline-starship.sh" "$HOME/.claude/hooks/statusline-starship.sh"
+        chmod +x "$HOME/.claude/hooks/statusline-starship.sh"
+        echo "✓ Script statusline copiato da repository"
+    else
+        echo "⚠️  Script statusline non trovato in data/, creo versione base..."
+        # Fallback: crea versione base se il file non esiste
+        cat > "$HOME/.claude/hooks/statusline-starship.sh" << 'EOF'
 #!/bin/bash
 # Starship-inspired status line for Claude Code
+# Format: model [usage%] username@hostname directory git_branch git_status python_venv
 
-# Read JSON input
 input=$(cat)
-
-# Extract current directory from input
-cwd=$(echo "$input" | jq -r '.workspace.current_dir')
-
-# Get username
+model_display=$(echo "$input" | jq -r '.model.display_name // .model.id // "unknown"')
+token_percentage=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
+if [ -n "$token_percentage" ]; then
+  token_display=$(printf "[%.0f%%]" "$token_percentage")
+  model_display="$model_display $token_display"
+fi
+dir=$(echo "$input" | jq -r '.workspace.current_dir')
 user=$(whoami)
-
-# Get git info if in a git repo
+host=$(hostname -s)
+repo_root=$(cd "$dir" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null)
+if [ -n "$repo_root" ]; then
+  rel_path=$(realpath --relative-to="$repo_root" "$dir" 2>/dev/null || echo ".")
+  if [ "$rel_path" = "." ]; then
+    display_dir=$(basename "$repo_root")
+  else
+    display_dir="$(basename "$repo_root")/$rel_path"
+  fi
+else
+  display_dir=$(echo "$dir" | sed "s|^$HOME|home|")
+fi
 git_info=""
-if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
-    branch=$(git -C "$cwd" branch --show-current 2>/dev/null || echo "detached")
-
-    # Check for modifications
-    if ! git -C "$cwd" diff-index --quiet HEAD -- 2>/dev/null; then
-        status_icon="\uf040"  # Modified icon
-        git_info=$(printf '\033[35m\uf1d3 \ue0a0 %s\033[0m \033[31m%s\033[0m ' "$branch" "$status_icon")
-    else
-        git_info=$(printf '\033[35m\uf1d3 \ue0a0 %s\033[0m ' "$branch")
-    fi
+git_status_icon=""
+if cd "$dir" 2>/dev/null && git rev-parse --git-dir >/dev/null 2>&1; then
+  branch=$(git -c core.useBuiltinFSMonitor=false branch --show-current 2>/dev/null || echo "HEAD")
+  git_icon=$(printf '\uf09b')
+  git_info=" $git_icon $branch"
+  status=$(git -c core.useBuiltinFSMonitor=false status --porcelain 2>/dev/null)
+  if [ -n "$status" ]; then
+    mod_icon=$(printf '\uf040')
+    git_status_icon=" $mod_icon"
+  fi
 fi
-
-# Get Python virtualenv info
-python_info=""
+venv=""
 if [ -n "$VIRTUAL_ENV" ]; then
-    venv_name=$(basename "$VIRTUAL_ENV")
-    python_info=$(printf '\033[33m\ue73c (%s) \033[0m' "$venv_name")
+  py_icon=$(printf '\ue73c')
+  venv=" $py_icon ($(basename "$VIRTUAL_ENV"))"
 fi
-
-# Format directory path (replace home with ~)
-display_dir="${cwd/#$HOME/\~}"
-
-# Output status line
-printf '\uf17c %s %s %s%s' "$user" "$display_dir" "$git_info" "$python_info"
+printf '\033[36m%s\033[0m \033[37m%s\033[0m@\033[1;32m%s\033[0m \033[37m%s\033[0m\033[32m%s%s\033[0m\033[33m%s\033[0m' \
+  "$model_display" "$user" "$host" "$display_dir" "$git_info" "$git_status_icon" "$venv"
 EOF
+        chmod +x "$HOME/.claude/hooks/statusline-starship.sh"
+    fi
 
-    chmod +x "$HOME/.claude/statusline-command.sh"
-
-    # Crea/aggiorna settings.json
+    # Crea/aggiorna settings.json preservando altre configurazioni
     if [ -f "$HOME/.claude/settings.json" ]; then
         # Backup esistente
         cp "$HOME/.claude/settings.json" "$HOME/.claude/settings.json.backup.$(date +%Y%m%d_%H%M%S)"
+        # Aggiorna solo statusLine usando jq
+        jq '. + {"statusLine": {"command": "~/.claude/hooks/statusline-starship.sh"}}' \
+            "$HOME/.claude/settings.json" > "$HOME/.claude/settings.json.tmp" && \
+            mv "$HOME/.claude/settings.json.tmp" "$HOME/.claude/settings.json"
+    else
+        echo '{"statusLine": {"command": "~/.claude/hooks/statusline-starship.sh"}}' > "$HOME/.claude/settings.json"
     fi
 
-    echo '{"statusLine": {"command": "~/.claude/statusline-command.sh"}}' > "$HOME/.claude/settings.json"
-
-    echo "✓ Claude Code status line configurata"
-    echo "  - Script: ~/.claude/statusline-command.sh"
+    echo "✓ Claude Code status line configurata (Enhanced)"
+    echo "  - Script: ~/.claude/hooks/statusline-starship.sh"
     echo "  - Config: ~/.claude/settings.json"
+    echo "  - Features: Model name, token usage %, git status, Python venv"
 }
 
 # Installa strumenti moderni (opzionale)
@@ -296,18 +388,18 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# Syntax highlighting colors - Ocean Blue theme
-ZSH_HIGHLIGHT_STYLES[command]='fg=#61afef'                      # Comandi validi: blu chiaro
-ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#e06c75'                # Non validi: rosso soft
-ZSH_HIGHLIGHT_STYLES[builtin]='fg=#56b6c2'                      # Built-in: cyan
-ZSH_HIGHLIGHT_STYLES[alias]='fg=#528bff'                        # Alias: blu elettrico
-ZSH_HIGHLIGHT_STYLES[path]='fg=#89b4fa,underline'               # Path: azzurro
-ZSH_HIGHLIGHT_STYLES[globbing]='fg=#74c7ec'                     # Glob: acqua
-ZSH_HIGHLIGHT_STYLES[precommand]='fg=#82aaff'                   # sudo, time: blu intenso
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#7dcfff'       # 'stringa': cyan brillante
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#7dcfff'       # "stringa": cyan brillante
-ZSH_HIGHLIGHT_STYLES[redirection]='fg=#4fc1ff'                  # >, <, |: blu cielo
-ZSH_HIGHLIGHT_STYLES[comment]='fg=#5c6370,italic'               # # commenti: grigio
+# Syntax highlighting colors - Green Theme (Custom)
+ZSH_HIGHLIGHT_STYLES[command]='fg=green'                        # Comandi validi: verde standard (no bold)
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#f7768e,bold'           # Non validi: rosso Tokyo Night
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=#bb9af7'                      # Built-in: viola soft
+ZSH_HIGHLIGHT_STYLES[alias]='fg=#73daca,bold'                   # Alias: verde acqua (teal)
+ZSH_HIGHLIGHT_STYLES[path]='fg=white'                           # Path: bianco (no underline)
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=#bb9af7'                     # Glob: viola soft
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=#7dcfff,bold'              # sudo, time: ciano (per attenzione)
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#e0af68'       # 'stringa': giallo Tokyo Night
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#e0af68'       # "stringa": giallo Tokyo Night
+ZSH_HIGHLIGHT_STYLES[redirection]='fg=#bb9af7'                  # >, <, |: viola soft
+ZSH_HIGHLIGHT_STYLES[comment]='fg=#56b6c2,italic'               # # commenti: ciano scuro
 
 # FZF integration (se disponibile)
 if [ -f /usr/share/fzf/shell/key-bindings.zsh ]; then
@@ -386,6 +478,7 @@ main() {
     install_zsh_plugins
     install_starship
     install_nerd_fonts
+    handle_wsl_fonts
     install_eza
     install_jq
     install_claude_code_statusline
