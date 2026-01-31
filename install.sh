@@ -157,6 +157,92 @@ install_eza() {
     fi
 }
 
+# Installa jq (richiesto per Claude Code status line)
+install_jq() {
+    echo -e "\n📊 Installazione jq (JSON parser)..."
+
+    if command -v jq &> /dev/null; then
+        echo "✓ jq già installato"
+        return
+    fi
+
+    if [ "$OS" = "fedora" ] || [ "$OS" = "rhel" ] || [ "$OS" = "centos" ]; then
+        sudo dnf install -y jq
+    elif [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
+        sudo apt install -y jq
+    fi
+}
+
+# Configura Claude Code status line
+install_claude_code_statusline() {
+    echo -e "\n🔗 Configurazione Claude Code Status Line..."
+
+    # Verifica che jq sia installato
+    if ! command -v jq &> /dev/null; then
+        echo "⚠️  jq non installato. Installo prima jq..."
+        install_jq
+    fi
+
+    # Crea directory Claude
+    mkdir -p "$HOME/.claude"
+
+    # Crea lo script della status line
+    cat > "$HOME/.claude/statusline-command.sh" << 'EOF'
+#!/bin/bash
+# Starship-inspired status line for Claude Code
+
+# Read JSON input
+input=$(cat)
+
+# Extract current directory from input
+cwd=$(echo "$input" | jq -r '.workspace.current_dir')
+
+# Get username
+user=$(whoami)
+
+# Get git info if in a git repo
+git_info=""
+if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
+    branch=$(git -C "$cwd" branch --show-current 2>/dev/null || echo "detached")
+
+    # Check for modifications
+    if ! git -C "$cwd" diff-index --quiet HEAD -- 2>/dev/null; then
+        status_icon="\uf040"  # Modified icon
+        git_info=$(printf '\033[35m\uf1d3 \ue0a0 %s\033[0m \033[31m%s\033[0m ' "$branch" "$status_icon")
+    else
+        git_info=$(printf '\033[35m\uf1d3 \ue0a0 %s\033[0m ' "$branch")
+    fi
+fi
+
+# Get Python virtualenv info
+python_info=""
+if [ -n "$VIRTUAL_ENV" ]; then
+    venv_name=$(basename "$VIRTUAL_ENV")
+    python_info=$(printf '\033[33m\ue73c (%s) \033[0m' "$venv_name")
+fi
+
+# Format directory path (replace home with ~)
+display_dir="${cwd/#$HOME/\~}"
+
+# Output status line
+printf '\uf17c %s %s %s%s' "$user" "$display_dir" "$git_info" "$python_info"
+EOF
+
+    chmod +x "$HOME/.claude/statusline-command.sh"
+
+    # Crea/aggiorna settings.json
+    if [ -f "$HOME/.claude/settings.json" ]; then
+        # Backup esistente
+        cp "$HOME/.claude/settings.json" "$HOME/.claude/settings.json.backup.$(date +%Y%m%d_%H%M%S)"
+    fi
+
+    echo '{"statusLine": {"command": "~/.claude/statusline-command.sh"}}' > "$HOME/.claude/settings.json"
+
+    echo "✓ Claude Code status line configurata"
+    echo "  - Script: ~/.claude/statusline-command.sh"
+    echo "  - Config: ~/.claude/settings.json"
+}
+
 # Installa strumenti moderni (opzionale)
 install_modern_tools() {
     echo -e "\n🛠️  Installazione strumenti moderni (opzionale)..."
@@ -301,6 +387,8 @@ main() {
     install_starship
     install_nerd_fonts
     install_eza
+    install_jq
+    install_claude_code_statusline
     install_modern_tools
     apply_starship_config
     configure_zshrc
@@ -314,6 +402,8 @@ main() {
     echo "1. Configura il terminale per usare 'MesloLGS NF' o 'JetBrainsMono Nerd Font'"
     echo "2. Chiudi e riapri il terminale (o esegui: source ~/.zshrc)"
     echo "3. Se hai cambiato shell, fai logout e login"
+    echo ""
+    echo "🔗 Claude Code status line configurata! Riavvia Claude Code per vederla."
     echo ""
     echo "📖 Per maggiori informazioni, leggi il README.md"
     echo ""

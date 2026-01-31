@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.3.0 - 2024-12-30
+
+### Nuove Funzionalità
+- 🔗 **Integrazione Claude Code Status Line**: Script dedicato per usare lo stesso tema Starship in Claude Code
+- 📜 Nuovo file `.claude-statusline.sh` per status line personalizzata
+- 🎨 Status line con icone e colori coerenti col tema Tokyo Night
+
+### Documentazione
+- Nuova sezione "Integrazione Claude Code Status Line" nel README
+- Istruzioni per configurazione automatica
+
 ## v1.2.0 - 2024-12-28
 
 ### Nuove Funzionalità

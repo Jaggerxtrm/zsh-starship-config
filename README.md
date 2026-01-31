@@ -71,8 +71,10 @@ Lo script installerà automaticamente:
 4. ✅ Starship
 5. ✅ Nerd Fonts (MesloLGS NF + JetBrainsMono)
 6. ✅ eza (modern ls con icone)
-7. ✅ Configurazione custom
-8. ⚙️ Strumenti moderni extra (opzionale)
+7. ✅ jq (JSON parser per Claude Code)
+8. ✅ Configurazione custom
+9. 🔗 Claude Code Status Line (tema Starship)
+10. ⚙️ Strumenti moderni extra (opzionale)
 
 ### Installazione Manuale
 
@@ -151,6 +153,81 @@ Nelle impostazioni del terminale, seleziona il font:
 source ~/.zshrc
 # Oppure chiudi e riapri il terminale
 ```
+
+## 🔗 Integrazione Claude Code Status Line
+
+Claude Code può usare lo **stesso tema Starship** per la sua status line!
+
+### Configurazione Automatica
+
+```bash
+# Crea la directory se non esiste
+mkdir -p ~/.claude
+
+# Crea lo script della status line
+cat > ~/.claude/statusline-command.sh << 'EOF'
+#!/bin/bash
+# Starship-inspired status line for Claude Code
+
+# Read JSON input
+input=$(cat)
+
+# Extract current directory from input
+cwd=$(echo "$input" | jq -r '.workspace.current_dir')
+
+# Get username
+user=$(whoami)
+
+# Get git info if in a git repo
+git_info=""
+if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
+    branch=$(git -C "$cwd" branch --show-current 2>/dev/null || echo "detached")
+
+    # Check for modifications
+    if ! git -C "$cwd" diff-index --quiet HEAD -- 2>/dev/null; then
+        status_icon="\uf040"  # Modified icon
+        git_info=$(printf '\033[35m\uf1d3 \ue0a0 %s\033[0m \033[31m%s\033[0m ' "$branch" "$status_icon")
+    else
+        git_info=$(printf '\033[35m\uf1d3 \ue0a0 %s\033[0m ' "$branch")
+    fi
+fi
+
+# Get Python virtualenv info
+python_info=""
+if [ -n "$VIRTUAL_ENV" ]; then
+    venv_name=$(basename "$VIRTUAL_ENV")
+    python_info=$(printf '\033[33m\ue73c (%s) \033[0m' "$venv_name")
+fi
+
+# Format directory path (replace home with ~)
+display_dir="${cwd/#$HOME/\~}"
+
+# Output status line
+printf '\uf17c %s %s %s%s' "$user" "$display_dir" "$git_info" "$python_info"
+EOF
+
+# Rendi eseguibile
+chmod +x ~/.claude/statusline-command.sh
+
+# Configura Claude Code
+mkdir -p ~/.claude
+echo '{"statusLine": {"command": "~/.claude/statusline-command.sh"}}' > ~/.claude/settings.json
+```
+
+### Cosa Mostra
+
+La status line Claude Code mostra:
+- 🐧 Icona Linux + username
+- Directory corrente
+- Branch Git (viola Tokyo Night)
+- Stato modifiche Git (rosso ✗ se dirty)
+- Virtual environment Python (giallo)
+
+Stesso look & feel del tuo Starship prompt!
+
+### Requisiti
+- `jq` per parsing JSON: `sudo dnf install jq` (Fedora) o `sudo apt install jq` (Ubuntu)
+- Nerd Font installato (già configurato per Starship)
 
 ## 🎨 Personalizzazione
 
