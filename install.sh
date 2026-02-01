@@ -4,8 +4,59 @@
 
 set -e
 
+# Variabili globali
+UPDATE_MODE=false
+VERBOSE=false
+
+# Funzione di help
+show_help() {
+    cat << EOF
+Usage: ./install.sh [OPTIONS]
+
+Installazione automatica di Zsh + Starship + Nerd Fonts
+
+OPTIONS:
+    -u, --update        Modalità update: aggiorna componenti già installati
+    -v, --verbose       Output dettagliato
+    -h, --help          Mostra questo messaggio
+
+EXAMPLES:
+    ./install.sh                # Installazione normale
+    ./install.sh --update       # Aggiorna tutti i componenti
+    ./install.sh -u -v          # Aggiorna con output verboso
+
+EOF
+}
+
+# Parse argomenti
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -u|--update)
+            UPDATE_MODE=true
+            shift
+            ;;
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        *)
+            echo "Opzione sconosciuta: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+done
+
 echo "==================================="
-echo "Installazione Zsh + Starship Setup"
+if [ "$UPDATE_MODE" = true ]; then
+    echo "Update Zsh + Starship Setup"
+else
+    echo "Installazione Zsh + Starship Setup"
+fi
 echo "==================================="
 
 # Rileva la distribuzione
@@ -78,9 +129,31 @@ install_starship() {
     echo -e "\n⭐ Installazione Starship..."
 
     if command -v starship &> /dev/null; then
-        echo "✓ Starship già installato ($(starship --version))"
+        CURRENT_VERSION=$(starship --version | grep -oP 'starship \K[\d.]+' || echo "unknown")
+        echo "✓ Starship già installato (v$CURRENT_VERSION)"
+
+        if [ "$UPDATE_MODE" = true ]; then
+            echo "🔄 Aggiornamento Starship..."
+            curl -sS https://starship.rs/install.sh | sh -s -- -y --force
+            NEW_VERSION=$(starship --version | grep -oP 'starship \K[\d.]+' || echo "unknown")
+            if [ "$NEW_VERSION" != "$CURRENT_VERSION" ]; then
+                echo "✓ Starship aggiornato: v$CURRENT_VERSION → v$NEW_VERSION"
+            else
+                echo "✓ Starship già alla versione più recente"
+            fi
+        else
+            read -p "Vuoi aggiornare Starship? (s/N) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Ss]$ ]]; then
+                curl -sS https://starship.rs/install.sh | sh -s -- -y --force
+                NEW_VERSION=$(starship --version | grep -oP 'starship \K[\d.]+' || echo "unknown")
+                echo "✓ Starship aggiornato a v$NEW_VERSION"
+            fi
+        fi
     else
+        echo "Installazione Starship..."
         curl -sS https://starship.rs/install.sh | sh -s -- -y
+        echo "✓ Starship installato"
     fi
 }
 
@@ -170,24 +243,66 @@ handle_wsl_fonts() {
 
         # Trova l'username Windows corrente
         WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
-        
+
         if [ -n "$WIN_USER" ]; then
             WIN_DEST="/mnt/c/Users/$WIN_USER/Downloads/NerdFonts_Zsh_Setup"
-            
-            echo "Copia dei font in Windows ($WIN_DEST)..."
-            mkdir -p "$WIN_DEST"
-            cp "$HOME/.local/share/fonts/"* "$WIN_DEST/" 2>/dev/null || true
-            cp "$HOME/.local/share/fonts/JetBrainsMonoNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
-            cp "$HOME/.local/share/fonts/HackNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
-            cp "$HOME/.local/share/fonts/FiraMonoNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
-            cp "$HOME/.local/share/fonts/CousineNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
 
-            echo ""
-            echo "⚠️  AZIONE RICHIESTA SU WINDOWS:"
-            echo "1. Apri la cartella 'Download/NerdFonts_Zsh_Setup' su Windows"
-            echo "2. Seleziona tutti i file .ttf/.otf"
-            echo "3. Tasto destro -> 'Installa' (o 'Installa per tutti gli utenti')"
-            echo "4. Configura Windows Terminal per usare 'MesloLGS NF'"
+            # Copia font in Windows solo se non esistono già o se in UPDATE_MODE
+            if [ "$UPDATE_MODE" = true ] || [ ! -d "$WIN_DEST" ]; then
+                echo "Copia dei font in Windows ($WIN_DEST)..."
+                mkdir -p "$WIN_DEST"
+
+                # Pulisci directory se in UPDATE_MODE
+                if [ "$UPDATE_MODE" = true ]; then
+                    rm -f "$WIN_DEST"/*.ttf "$WIN_DEST"/*.otf 2>/dev/null || true
+                fi
+
+                cp "$HOME/.local/share/fonts/"*.ttf "$WIN_DEST/" 2>/dev/null || true
+                cp "$HOME/.local/share/fonts/JetBrainsMonoNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
+                cp "$HOME/.local/share/fonts/HackNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
+                cp "$HOME/.local/share/fonts/FiraMonoNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
+                cp "$HOME/.local/share/fonts/CousineNerdFont/"* "$WIN_DEST/" 2>/dev/null || true
+
+                echo "✓ Font copiati in Windows"
+            else
+                echo "✓ Font già copiati in $WIN_DEST"
+            fi
+
+            # Trova lo script PowerShell
+            SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+            PS_SCRIPT="$SCRIPT_DIR/scripts/install-fonts-windows.ps1"
+
+            if [ -f "$PS_SCRIPT" ]; then
+                echo ""
+                echo "🚀 Installazione automatica font su Windows..."
+
+                # Converte path WSL in Windows path
+                WIN_PS_SCRIPT=$(wslpath -w "$PS_SCRIPT")
+
+                # Esegui script PowerShell
+                if powershell.exe -ExecutionPolicy Bypass -File "$WIN_PS_SCRIPT" 2>&1; then
+                    echo "✓ Font installati automaticamente su Windows!"
+                    echo ""
+                    echo "⚠️  AZIONE RICHIESTA:"
+                    echo "1. Riavvia Windows Terminal"
+                    echo "2. Impostazioni → Profili → Ubuntu/WSL → Aspetto"
+                    echo "3. Tipo di carattere: 'MesloLGS NF'"
+                else
+                    echo "⚠️  Installazione automatica fallita. Procedura manuale:"
+                    echo ""
+                    echo "1. Apri la cartella 'Download/NerdFonts_Zsh_Setup' su Windows"
+                    echo "2. Seleziona tutti i file .ttf/.otf"
+                    echo "3. Tasto destro → 'Installa' (o 'Installa per tutti gli utenti')"
+                    echo "4. Configura Windows Terminal per usare 'MesloLGS NF'"
+                fi
+            else
+                echo ""
+                echo "⚠️  Script PowerShell non trovato. AZIONE RICHIESTA SU WINDOWS:"
+                echo "1. Apri la cartella 'Download/NerdFonts_Zsh_Setup' su Windows"
+                echo "2. Seleziona tutti i file .ttf/.otf"
+                echo "3. Tasto destro → 'Installa' (o 'Installa per tutti gli utenti')"
+                echo "4. Configura Windows Terminal per usare 'MesloLGS NF'"
+            fi
         else
             echo "⚠️  Impossibile determinare l'utente Windows. Copia manuale richiesta."
         fi
@@ -199,7 +314,29 @@ install_eza() {
     echo -e "\n📁 Installazione eza (modern ls)..."
 
     if command -v eza &> /dev/null; then
-        echo "✓ eza già installato ($(eza --version | head -1))"
+        CURRENT_VERSION=$(eza --version | head -1)
+        echo "✓ eza già installato ($CURRENT_VERSION)"
+
+        if [ "$UPDATE_MODE" = true ]; then
+            echo "🔄 Aggiornamento eza..."
+            # Se installato da repo, usa package manager
+            if [ "$OS" = "fedora" ] && sudo dnf list installed eza &> /dev/null; then
+                sudo dnf update -y eza
+            else
+                # Reinstalla da GitHub
+                update_eza_from_github
+            fi
+        else
+            read -p "Vuoi aggiornare eza? (s/N) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Ss]$ ]]; then
+                if [ "$OS" = "fedora" ] && sudo dnf list installed eza &> /dev/null; then
+                    sudo dnf update -y eza
+                else
+                    update_eza_from_github
+                fi
+            fi
+        fi
         return
     fi
 
@@ -213,6 +350,11 @@ install_eza() {
     fi
 
     # Fallback: installa da GitHub releases
+    update_eza_from_github
+}
+
+# Helper per aggiornare eza da GitHub
+update_eza_from_github() {
     echo "Installazione da GitHub releases..."
     cd /tmp
     ARCH=$(uname -m)
@@ -223,7 +365,8 @@ install_eza() {
         mv eza "$HOME/.local/bin/"
         chmod +x "$HOME/.local/bin/eza"
         rm eza_x86_64-unknown-linux-gnu.tar.gz
-        echo "✓ eza installato in ~/.local/bin/"
+        NEW_VERSION=$(eza --version | head -1)
+        echo "✓ eza installato/aggiornato: $NEW_VERSION"
     else
         echo "⚠️  Architettura $ARCH non supportata per download automatico"
         echo "   Installa manualmente da: https://github.com/eza-community/eza/releases"
@@ -364,13 +507,57 @@ apply_starship_config() {
 configure_zshrc() {
     echo -e "\n📝 Configurazione .zshrc..."
 
-    # Backup del .zshrc esistente
-    if [ -f "$HOME/.zshrc" ]; then
-        cp "$HOME/.zshrc" "$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)"
-        echo "✓ Backup .zshrc creato"
+    ZSHRC="$HOME/.zshrc"
+
+    # Se .zshrc non esiste, crea nuovo file
+    if [ ! -f "$ZSHRC" ]; then
+        echo "Creazione nuovo .zshrc..."
+        create_new_zshrc
+        echo "✓ .zshrc creato"
+        return
     fi
 
-    # Crea nuovo .zshrc
+    # .zshrc esiste: fai backup
+    BACKUP="$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)"
+    cp "$ZSHRC" "$BACKUP"
+    echo "✓ Backup creato: $BACKUP"
+
+    # Controlla se ha già configurazione Starship
+    if grep -q "starship init zsh" "$ZSHRC"; then
+        echo "✓ Configurazione Starship già presente"
+
+        # In UPDATE_MODE, chiedi se sovrascrivere
+        if [ "$UPDATE_MODE" = true ]; then
+            read -p "Vuoi sovrascrivere completamente .zshrc? (s/N) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Ss]$ ]]; then
+                create_new_zshrc
+                echo "✓ .zshrc sovrascritto"
+            else
+                echo "✓ .zshrc mantenuto (usa backup se serve: $BACKUP)"
+                merge_zshrc_config
+            fi
+        else
+            # Modalità normale: aggiungi solo elementi mancanti
+            merge_zshrc_config
+        fi
+    else
+        # Non ha Starship: chiedi se sovrascrivere o aggiungere
+        echo "⚠️  .zshrc esistente senza configurazione Starship"
+        read -p "Vuoi sovrascrivere .zshrc? (s=sovrascrivi, N=aggiungi Starship) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Ss]$ ]]; then
+            create_new_zshrc
+            echo "✓ .zshrc sovrascritto"
+        else
+            add_starship_to_existing_zshrc
+            echo "✓ Starship aggiunto a .zshrc esistente"
+        fi
+    fi
+}
+
+# Helper: crea .zshrc completo da zero
+create_new_zshrc() {
     cat > "$HOME/.zshrc" << 'EOF'
 # Oh My Zsh configuration
 export ZSH="$HOME/.oh-my-zsh"
@@ -451,8 +638,68 @@ export NVM_DIR="$HOME/.nvm"
 # PATH
 export PATH="$HOME/.local/bin:$PATH"
 EOF
+}
 
-    echo "✓ .zshrc configurato"
+# Helper: merge configurazione in .zshrc esistente
+merge_zshrc_config() {
+    echo "Aggiornamento elementi mancanti in .zshrc..."
+
+    ZSHRC="$HOME/.zshrc"
+
+    # Aggiungi plugin mancanti
+    REQUIRED_PLUGINS=("zsh-autosuggestions" "zsh-syntax-highlighting" "zsh-history-substring-search")
+    for plugin in "${REQUIRED_PLUGINS[@]}"; do
+        if ! grep -q "$plugin" "$ZSHRC"; then
+            echo "Aggiunta plugin: $plugin"
+            # Trova la linea plugins=() e aggiungi il plugin
+            sed -i "/^plugins=(/a\    $plugin" "$ZSHRC"
+        fi
+    done
+
+    # Verifica PATH per .local/bin
+    if ! grep -q 'PATH.*\.local/bin' "$ZSHRC"; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$ZSHRC"
+        echo "✓ PATH aggiornato"
+    fi
+
+    # Verifica alias eza se non presenti
+    if command -v eza &> /dev/null && ! grep -q "alias.*eza" "$ZSHRC"; then
+        cat >> "$ZSHRC" << 'EOF'
+
+# Alias eza (modern ls)
+if command -v eza &> /dev/null; then
+    alias ls='eza --icons --group-directories-first'
+    alias ll='eza -l --icons --group-directories-first'
+    alias la='eza -la --icons --group-directories-first'
+    alias lt='eza --tree --icons --group-directories-first --git-ignore --ignore-glob="venv|.venv|env|.env|node_modules|.git"'
+    alias lta='eza --tree --icons --group-directories-first'
+fi
+EOF
+        echo "✓ Alias eza aggiunti"
+    fi
+
+    echo "✓ .zshrc aggiornato (merge)"
+}
+
+# Helper: aggiungi solo Starship a .zshrc esistente
+add_starship_to_existing_zshrc() {
+    ZSHRC="$HOME/.zshrc"
+
+    # Aggiungi init Starship alla fine
+    cat >> "$ZSHRC" << 'EOF'
+
+# Starship prompt (added by zsh-starship-config installer)
+if command -v starship &> /dev/null; then
+    eval "$(starship init zsh)"
+fi
+EOF
+
+    # Aggiungi PATH se mancante
+    if ! grep -q 'PATH.*\.local/bin' "$ZSHRC"; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$ZSHRC"
+    fi
+
+    echo "✓ Starship aggiunto a .zshrc"
 }
 
 # Cambia shell a zsh
@@ -471,6 +718,126 @@ change_shell_to_zsh() {
     fi
 }
 
+# Verifica post-installazione
+verify_installation() {
+    echo -e "\n🔍 Verifica installazione..."
+    echo ""
+
+    ERRORS=0
+    WARNINGS=0
+
+    # Verifica Zsh
+    if command -v zsh &> /dev/null; then
+        ZSH_VER=$(zsh --version | cut -d' ' -f2)
+        echo "✓ Zsh: v$ZSH_VER"
+    else
+        echo "❌ Zsh non trovato"
+        ((ERRORS++))
+    fi
+
+    # Verifica Oh My Zsh
+    if [ -d "$HOME/.oh-my-zsh" ]; then
+        echo "✓ Oh My Zsh: installato"
+    else
+        echo "❌ Oh My Zsh non trovato"
+        ((ERRORS++))
+    fi
+
+    # Verifica plugin Zsh
+    ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+    if [ -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+        echo "✓ Plugin zsh-autosuggestions: installato"
+    else
+        echo "⚠️  Plugin zsh-autosuggestions non trovato"
+        ((WARNINGS++))
+    fi
+
+    # Verifica Starship
+    if command -v starship &> /dev/null; then
+        STARSHIP_VER=$(starship --version | grep -oP 'starship \K[\d.]+' || echo "unknown")
+        echo "✓ Starship: v$STARSHIP_VER"
+
+        # Verifica config Starship
+        if [ -f "$HOME/.config/starship.toml" ]; then
+            echo "✓ Configurazione Starship: presente"
+        else
+            echo "⚠️  Configurazione Starship non trovata"
+            ((WARNINGS++))
+        fi
+
+        # Test rendering Starship
+        if [ "$VERBOSE" = true ]; then
+            TEST_OUTPUT=$(starship prompt 2>&1)
+            if [ $? -eq 0 ]; then
+                echo "✓ Test rendering Starship: OK"
+            else
+                echo "⚠️  Starship warning: $TEST_OUTPUT"
+                ((WARNINGS++))
+            fi
+        fi
+    else
+        echo "❌ Starship non trovato"
+        ((ERRORS++))
+    fi
+
+    # Verifica Nerd Fonts
+    if fc-list | grep -qi "MesloLGS NF"; then
+        echo "✓ Font MesloLGS NF: installato"
+    else
+        echo "⚠️  Font MesloLGS NF non installato"
+        ((WARNINGS++))
+    fi
+
+    # Verifica eza
+    if command -v eza &> /dev/null; then
+        EZA_VER=$(eza --version | head -1)
+        echo "✓ eza: $EZA_VER"
+    else
+        echo "⚠️  eza non installato (opzionale)"
+    fi
+
+    # Verifica jq (per Claude Code)
+    if command -v jq &> /dev/null; then
+        echo "✓ jq: installato"
+    else
+        echo "⚠️  jq non installato (richiesto per Claude Code)"
+        ((WARNINGS++))
+    fi
+
+    # Verifica Claude Code statusline
+    if [ -f "$HOME/.claude/hooks/statusline-starship.sh" ]; then
+        echo "✓ Claude Code statusline: configurata"
+    else
+        echo "⚠️  Claude Code statusline non configurata"
+    fi
+
+    # Verifica .zshrc
+    if [ -f "$HOME/.zshrc" ]; then
+        if grep -q "starship init zsh" "$HOME/.zshrc"; then
+            echo "✓ .zshrc: configurato con Starship"
+        else
+            echo "⚠️  .zshrc non contiene init Starship"
+            ((WARNINGS++))
+        fi
+    else
+        echo "❌ .zshrc non trovato"
+        ((ERRORS++))
+    fi
+
+    # Sommario
+    echo ""
+    echo "==================================="
+    if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then
+        echo "✅ Tutte le verifiche passate!"
+    elif [ $ERRORS -eq 0 ]; then
+        echo "✅ Installazione completata con $WARNINGS avvisi"
+    else
+        echo "⚠️  Installazione completata con $ERRORS errori e $WARNINGS avvisi"
+        return 1
+    fi
+    echo "==================================="
+}
+
 # Main
 main() {
     install_base_packages
@@ -481,14 +848,21 @@ main() {
     handle_wsl_fonts
     install_eza
     install_jq
-    install_claude_code_statusline
+    apply_starship_config          # IMPORTANTE: prima di Claude Code statusline
+    install_claude_code_statusline  # Usa la config Starship
     install_modern_tools
-    apply_starship_config
     configure_zshrc
     change_shell_to_zsh
 
+    # Verifica installazione
+    verify_installation
+
     echo -e "\n==================================="
-    echo "✅ Installazione completata!"
+    if [ "$UPDATE_MODE" = true ]; then
+        echo "✅ Update completato!"
+    else
+        echo "✅ Installazione completata!"
+    fi
     echo "==================================="
     echo ""
     echo "⚠️  PROSSIMI PASSI:"
@@ -500,6 +874,12 @@ main() {
     echo ""
     echo "📖 Per maggiori informazioni, leggi il README.md"
     echo ""
+
+    # Suggerimenti per UPDATE_MODE
+    if [ "$UPDATE_MODE" = true ]; then
+        echo "💡 TIP: Se hai fatto update, esegui 'source ~/.zshrc' per ricaricare la config"
+        echo ""
+    fi
 }
 
 main

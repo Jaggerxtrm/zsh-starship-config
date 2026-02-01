@@ -58,13 +58,25 @@ Esempio:
 
 Se usi WSL (Windows Subsystem for Linux), lo script rileverà automaticamente l'ambiente.
 
-Poiché Windows Terminal non può leggere i font installati dentro Linux:
-1. Lo script copierà i font nella tua cartella **Download** di Windows (in `NerdFonts_Zsh_Setup`).
-2. Dovrai andare in quella cartella su Windows.
-3. Selezionare i file, **Tasto Destro** → **Installa**.
-4. Configurare Windows Terminal:
+### 🎉 Installazione automatica font (NUOVO!)
+
+Lo script ora **installa automaticamente i font su Windows** tramite PowerShell:
+
+1. ✅ Copia i font in `C:\Users\TuoNome\Downloads\NerdFonts_Zsh_Setup`
+2. ✅ **Esegue PowerShell per installarli** (no manual install richiesto!)
+3. ✅ Registra i font nel Registry di Windows
+4. ⚙️ Devi solo configurare Windows Terminal:
    - Impostazioni → Profili → Ubuntu (o la tua distro) → Aspetto
    - Tipo di carattere: **MesloLGS NF**
+   - Riavvia Windows Terminal
+
+### Fallback manuale (se PowerShell fallisce)
+
+Se l'installazione automatica fallisce:
+1. Lo script copierà comunque i font in **Download** (`NerdFonts_Zsh_Setup`)
+2. Apri quella cartella su Windows
+3. Seleziona tutti i file .ttf
+4. **Tasto Destro** → **Installa**
 
 ## 🚀 Installazione Rapida
 
@@ -75,6 +87,38 @@ cd ~/projects/zsh-starship-config
 chmod +x install.sh
 ./install.sh
 ```
+
+### 🔄 Aggiornamento (Update)
+
+Se hai già installato una versione precedente:
+
+```bash
+cd ~/projects/zsh-starship-config
+git pull
+./install.sh --update
+# Oppure usa il wrapper:
+./update.sh
+```
+
+**Novità modalità update:**
+- ✅ Aggiorna Starship, eza e altri componenti
+- ✅ **NON sovrascrive** il tuo `.zshrc` (merge intelligente)
+- ✅ Backup automatico di tutte le configurazioni
+- ✅ (WSL) Installazione automatica font su Windows
+- ✅ Verifica post-installazione
+
+📖 Vedi [UPGRADE.md](UPGRADE.md) per la guida completa all'aggiornamento.
+
+### Opzioni disponibili
+
+```bash
+./install.sh           # Installazione normale
+./install.sh --update  # Modalità update (aggiorna componenti esistenti)
+./install.sh --verbose # Output dettagliato
+./install.sh --help    # Mostra tutte le opzioni
+```
+
+## 📦 Cosa viene installato
 
 Lo script installerà automaticamente:
 1. ✅ Zsh

@@ -1,5 +1,169 @@
 # Changelog
 
+## v2.0.0 - 2026-02-01
+
+### 🎉 Major Release: Update System & Smart Configuration
+
+Questa è una major release che risolve i problemi di aggiornamento e introduce un sistema intelligente di gestione configurazioni.
+
+### 🔄 Nuove Funzionalità
+
+#### Sistema di Update
+- **Flag `--update`**: Modalità update dedicata per aggiornare installazioni esistenti
+- **Verifica versioni**: Controlla versioni Starship, eza prima di reinstallare
+- **Update interattivo**: Chiede conferma prima di aggiornare ogni componente
+- **Script wrapper `update.sh`**: Shortcut per `./install.sh --update` + `git pull`
+- **Flag `--verbose`**: Output dettagliato per debugging
+
+#### Merge Intelligente .zshrc
+- **NON sovrascrive più** le personalizzazioni utente!
+- **Merge automatico**: Aggiunge solo elementi mancanti (plugin, alias, Starship)
+- **Backup automatico**: Crea `~/.zshrc.backup.TIMESTAMP` ad ogni modifica
+- **Rilevamento configurazione**: Controlla se Starship è già configurato
+- **Prompt intelligente**: Chiede cosa fare in caso di conflitto
+
+#### Installazione Automatica Font Windows (WSL)
+- **PowerShell automation**: Installa font su Windows automaticamente da WSL
+- **User-level install**: Non richiede privilegi amministratore
+- **Registry integration**: Registra font in Windows Registry
+- **Fallback manuale**: Se PowerShell fallisce, istruzioni manuali chiare
+- **Update-aware**: Non ricopia font se già presenti (in modalità normale)
+
+#### Verifica Post-Installazione
+- **Auto-check**: Verifica automatica di tutti i componenti installati
+- **Report dettagliato**: Mostra versioni installate e componenti mancanti
+- **Contatore errori/warning**: Distingue errori critici da avvisi
+- **Test rendering**: (con `--verbose`) Verifica che Starship funzioni
+
+#### Ordine di Installazione Corretto
+- **FIX CRITICO**: `apply_starship_config()` ora eseguito PRIMA di `install_claude_code_statusline()`
+- Garantisce che Claude Code statusline abbia accesso alla configurazione Starship
+
+### 📝 File Nuovi/Modificati
+
+#### Nuovi File
+- `scripts/install-fonts-windows.ps1` - Script PowerShell per installazione automatica font
+- `UPGRADE.md` - Guida completa all'aggiornamento
+- `update.sh` - Script wrapper per update rapido
+
+#### File Modificati
+- `install.sh` - Completamente rivisitato con nuove funzionalità
+- `README.md` - Sezioni update, WSL e opzioni CLI
+- `CHANGELOG.md` - Questo file
+
+### 🔧 Miglioramenti Funzioni
+
+#### `install_starship()`
+- Rileva versione corrente
+- Confronta versioni prima/dopo update
+- Prompt interattivo per aggiornamento
+- Supporto `--update` mode
+
+#### `install_eza()`
+- Update da package manager (se installato così)
+- Update da GitHub releases (fallback)
+- Helper function `update_eza_from_github()`
+- Verifica versione installata
+
+#### `handle_wsl_fonts()`
+- Integrazione script PowerShell
+- Conversione path WSL → Windows (`wslpath`)
+- Pulizia directory in UPDATE_MODE
+- Fallback manuale se PowerShell fallisce
+
+#### `configure_zshrc()`
+- **Breaking change**: Non sovrascrive più automaticamente
+- Nuove funzioni helper:
+  - `create_new_zshrc()` - Crea .zshrc da zero
+  - `merge_zshrc_config()` - Merge elementi mancanti
+  - `add_starship_to_existing_zshrc()` - Aggiunge solo Starship
+- Backup automatico con timestamp
+- Rilevamento configurazione esistente
+
+#### `verify_installation()`
+- **Nuova funzione**: Verifica completa post-installazione
+- Check componenti: Zsh, Starship, eza, jq, font, Claude statusline
+- Report formattato con ✓ ⚠️ ❌
+- Return code 1 se errori critici
+
+### 🎯 Edge Cases Risolti
+
+1. **Starship già installato**: Non reinstalla, propone update
+2. **eza già installato**: Verifica package manager vs GitHub install
+3. **Font WSL duplicati**: Non ricopia se già presenti
+4. **`.zshrc` personalizzato**: Merge invece di overwrite
+5. **Configurazione Starship mancante**: Rilevata e corretta
+6. **Claude statusline prima di starship.toml**: Ordine corretto
+
+### 🪟 WSL: Dettagli Tecnici
+
+#### Font Installation Flow
+```bash
+1. Copia font → /mnt/c/Users/$WIN_USER/Downloads/NerdFonts_Zsh_Setup
+2. Genera script PowerShell → /tmp/install-fonts.ps1
+3. Converti path → wslpath -w
+4. Esegui PowerShell → powershell.exe -ExecutionPolicy Bypass
+5. Installa font → $env:LOCALAPPDATA\Microsoft\Windows\Fonts
+6. Registra → HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts
+```
+
+#### Registry Key Format
+```powershell
+Name: "FontBaseName (TrueType)"  # o (OpenType)
+Value: "FontFileName.ttf"
+```
+
+### 📖 Documentazione
+
+- **UPGRADE.md**: Guida completa 2000+ parole con:
+  - Comparazione Before/After
+  - Troubleshooting dedicato
+  - Best practices
+  - Esempi pratici
+- **README.md**: Sezioni aggiornate per update e WSL
+- **Help integrato**: `./install.sh --help`
+
+### ⚠️ Breaking Changes
+
+1. **Comportamento .zshrc**: Non sovrascrive più automaticamente
+   - **Migrazione**: Se vuoi il vecchio comportamento, usa `--update` e conferma overwrite
+2. **Ordine esecuzione**: `apply_starship_config` spostato prima di Claude statusline
+   - **Impatto**: Nessuno per utenti finali, fix interno
+
+### 🔄 Upgrade Path
+
+Da v1.x a v2.0:
+```bash
+cd ~/projects/zsh-starship-config
+git pull
+./install.sh --update
+```
+
+Risultato:
+- ✅ Starship aggiornato
+- ✅ .zshrc preservato (merge solo elementi mancanti)
+- ✅ Font Windows auto-installati (se WSL)
+- ✅ Verifica automatica componenti
+
+### 🐛 Bug Fixes
+
+- **FIX**: Starship config applicato dopo Claude statusline (ora prima)
+- **FIX**: Font WSL copiati ad ogni run (ora solo se necessario)
+- **FIX**: .zshrc sovrascritto senza chiedere (ora merge intelligente)
+- **FIX**: Nessuna verifica post-install (ora automatica)
+- **FIX**: Versioni componenti non verificate (ora controllate)
+
+### 📊 Statistiche
+
+- **Linee di codice**: ~870 (era ~506, +72%)
+- **Nuove funzioni**: 7 (`merge_zshrc_config`, `add_starship_to_existing_zshrc`, `create_new_zshrc`, `verify_installation`, `update_eza_from_github`, `show_help`, PowerShell script)
+- **Nuovi file**: 3 (UPGRADE.md, update.sh, install-fonts-windows.ps1)
+- **Flag CLI**: 3 (--update, --verbose, --help)
+
+### 🙏 Grazie
+
+Questa release è stata sviluppata per risolvere problemi reali di utenti che aggiornavano da versioni precedenti.
+
 ## v1.7.0 - 2026-01-31
 
 ### Nuove Funzionalità
