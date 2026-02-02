@@ -7,6 +7,7 @@ set -e
 # Variabili globali
 UPDATE_MODE=false
 VERBOSE=false
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Funzione di help
 show_help() {
@@ -161,6 +162,7 @@ install_starship() {
 install_nerd_fonts() {
     echo -e "\n🔤 Installazione Nerd Fonts..."
 
+    local CURRENT_DIR=$(pwd)
     FONT_DIR="$HOME/.local/share/fonts"
     mkdir -p "$FONT_DIR"
 
@@ -232,6 +234,7 @@ install_nerd_fonts() {
 
     # Refresh cache
     fc-cache -fv "$FONT_DIR" > /dev/null 2>&1
+    cd "$CURRENT_DIR"
 }
 
 # Gestione Font per WSL (Windows Subsystem for Linux)
@@ -356,6 +359,7 @@ install_eza() {
 # Helper per aggiornare eza da GitHub
 update_eza_from_github() {
     echo "Installazione da GitHub releases..."
+    local CURRENT_DIR=$(pwd)
     cd /tmp
     ARCH=$(uname -m)
     if [ "$ARCH" = "x86_64" ]; then
@@ -371,6 +375,7 @@ update_eza_from_github() {
         echo "⚠️  Architettura $ARCH non supportata per download automatico"
         echo "   Installa manualmente da: https://github.com/eza-community/eza/releases"
     fi
+    cd "$CURRENT_DIR"
 }
 
 # Installa jq (richiesto per Claude Code status line)
@@ -499,7 +504,7 @@ apply_starship_config() {
     echo -e "\n⚙️  Applicazione configurazione Starship..."
 
     mkdir -p "$HOME/.config"
-    cp starship.toml "$HOME/.config/starship.toml"
+    cp "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
     echo "✓ Configurazione Starship copiata"
 }
 
@@ -607,6 +612,9 @@ if command -v eza &> /dev/null; then
     alias la='eza -la --icons --group-directories-first'
     alias lt='eza --tree --icons --group-directories-first --git-ignore --ignore-glob="venv|.venv|env|.env|node_modules|.git"'
     alias lta='eza --tree --icons --group-directories-first'  # tree ALL (senza esclusioni)
+    alias lsga='eza --tree --icons --group-directories-first --git'  # tree ALL con git status
+    alias lsg3='eza --tree --level 3 --icons --group-directories-first --git'  # tree 3 livelli con git status
+    alias lsgm='git status -s'  # solo file modificati (git)
 fi
 
 if command -v bat &> /dev/null; then
@@ -637,6 +645,21 @@ export NVM_DIR="$HOME/.nvm"
 
 # PATH
 export PATH="$HOME/.local/bin:$PATH"
+
+# Bun completions (se installato)
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# Bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Alias per gestire i dotfiles (Bare Git Repository)
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+
+# Disable non-essential traffic and telemetry
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+export DISABLE_TELEMETRY=1
+export DISABLE_ERROR_REPORTING=1
 EOF
 }
 

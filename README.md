@@ -14,7 +14,7 @@ The prompt displays:
 Example:
 ```
  dawid ~/projects/my-repo  main  venv
-⮕
+>
 ```
 
 ## Features
@@ -309,9 +309,9 @@ style = "#f7768e"  # Tokyo Night Red
 # Python/Languages
 style = "#e0af68"  # Tokyo Night Yellow
 
-# Prompt character (Ocean Blue)
-success_symbol = "[⮕](#61afef)"  # Light Blue
-error_symbol = "[⮕](#e06c75)"    # Soft Red
+# Prompt character (Green/Red)
+success_symbol = "[>](bold green)"
+error_symbol = "[>](bold red)"
 ```
 
 ### Syntax Highlighting (Ocean Blue)

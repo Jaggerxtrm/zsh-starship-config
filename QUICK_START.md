@@ -75,7 +75,7 @@ cd ~/projects/qualche-repo
 
 # Dovresti vedere:
 #  dawid ~/projects/qualche-repo  main
-# ⮕
+# >
 
 # Fai modifiche per testare git status
 touch test.txt
