@@ -12,10 +12,9 @@ The prompt displays:
 - Command duration (if exceeding 2 seconds)
 
 Example:
-```
- dawid ~/projects/my-repo  main  venv
->
-```
+
+<img width="3840" height="2336" alt="image" src="https://github.com/user-attachments/assets/7aae75a5-85c1-46fc-a44a-8dad191a9b0c" />
+
 
 ## Features
 
