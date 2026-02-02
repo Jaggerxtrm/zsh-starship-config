@@ -1,0 +1,17 @@
+# Configuration Version Tracking
+# This file tracks the versions of individual configuration components
+
+STARSHIP_CONFIG_VERSION=2.1.0
+ZSHRC_TEMPLATE_VERSION=2.1.0
+
+# Version History:
+# 2.1.0 (2026-02-02)
+#   - Added custom eza aliases (lsga, lsg3, lsgm)
+#   - Added Bun configuration
+#   - Added dotfiles bare git alias
+#   - Added Claude Code telemetry disabling
+#   - Fixed install.sh directory handling bugs
+#
+# 2.0.0 (Previous release)
+#   - Initial English translation
+#   - System configuration update

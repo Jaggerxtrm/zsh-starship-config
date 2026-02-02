@@ -9,6 +9,14 @@ UPDATE_MODE=false
 VERBOSE=false
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Update tracking variables
+STARSHIP_UPDATED=false
+STARSHIP_SKIPPED=false
+STARSHIP_UNCHANGED=false
+ZSHRC_UPDATED=false
+ZSHRC_SKIPPED=false
+ZSHRC_UNCHANGED=false
+
 # Funzione di help
 show_help() {
     cat << EOF
@@ -504,8 +512,44 @@ apply_starship_config() {
     echo -e "\n⚙️  Applicazione configurazione Starship..."
 
     mkdir -p "$HOME/.config"
-    cp "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
-    echo "✓ Configurazione Starship copiata"
+
+    # Check if file exists and differs
+    if [ -f "$HOME/.config/starship.toml" ]; then
+        if ! diff -q "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml" &>/dev/null; then
+            echo "⚠️  starship.toml differs from repository version"
+
+            if [ "$UPDATE_MODE" = true ]; then
+                # Automatic backup and update in update mode
+                BACKUP="$HOME/.config/starship.toml.backup.$(date +%Y%m%d_%H%M%S)"
+                cp "$HOME/.config/starship.toml" "$BACKUP"
+                cp "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
+                echo "✓ starship.toml updated (backup: $BACKUP)"
+                STARSHIP_UPDATED=true
+            else
+                # Ask user in normal mode
+                read -p "Update starship.toml? Your changes will be backed up. (s/N) " -n 1 -r
+                echo
+                if [[ $REPLY =~ ^[Ss]$ ]]; then
+                    BACKUP="$HOME/.config/starship.toml.backup.$(date +%Y%m%d_%H%M%S)"
+                    cp "$HOME/.config/starship.toml" "$BACKUP"
+                    cp "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
+                    echo "✓ starship.toml updated (backup: $BACKUP)"
+                    STARSHIP_UPDATED=true
+                else
+                    echo "⊘ starship.toml update skipped"
+                    STARSHIP_SKIPPED=true
+                fi
+            fi
+        else
+            echo "✓ starship.toml already up to date"
+            STARSHIP_UNCHANGED=true
+        fi
+    else
+        # New installation
+        cp "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
+        echo "✓ starship.toml created"
+        STARSHIP_UPDATED=true
+    fi
 }
 
 # Configura .zshrc
@@ -519,6 +563,7 @@ configure_zshrc() {
         echo "Creazione nuovo .zshrc..."
         create_new_zshrc
         echo "✓ .zshrc creato"
+        ZSHRC_UPDATED=true
         return
     fi
 
@@ -538,13 +583,14 @@ configure_zshrc() {
             if [[ $REPLY =~ ^[Ss]$ ]]; then
                 create_new_zshrc
                 echo "✓ .zshrc sovrascritto"
+                ZSHRC_UPDATED=true
             else
                 echo "✓ .zshrc mantenuto (usa backup se serve: $BACKUP)"
-                merge_zshrc_config
+                merge_zshrc_config  # This sets ZSHRC_UPDATED or ZSHRC_UNCHANGED
             fi
         else
             # Modalità normale: aggiungi solo elementi mancanti
-            merge_zshrc_config
+            merge_zshrc_config  # This sets ZSHRC_UPDATED or ZSHRC_UNCHANGED
         fi
     else
         # Non ha Starship: chiedi se sovrascrivere o aggiungere
@@ -554,9 +600,11 @@ configure_zshrc() {
         if [[ $REPLY =~ ^[Ss]$ ]]; then
             create_new_zshrc
             echo "✓ .zshrc sovrascritto"
+            ZSHRC_UPDATED=true
         else
             add_starship_to_existing_zshrc
             echo "✓ Starship aggiunto a .zshrc esistente"
+            ZSHRC_UPDATED=true
         fi
     fi
 }
@@ -668,26 +716,38 @@ merge_zshrc_config() {
     echo "Aggiornamento elementi mancanti in .zshrc..."
 
     ZSHRC="$HOME/.zshrc"
+    local CHANGES_MADE=false
 
     # Aggiungi plugin mancanti
     REQUIRED_PLUGINS=("zsh-autosuggestions" "zsh-syntax-highlighting" "zsh-history-substring-search")
     for plugin in "${REQUIRED_PLUGINS[@]}"; do
         if ! grep -q "$plugin" "$ZSHRC"; then
-            echo "Aggiunta plugin: $plugin"
-            # Trova la linea plugins=() e aggiungi il plugin
+            echo "  + Aggiunta plugin: $plugin"
             sed -i "/^plugins=(/a\    $plugin" "$ZSHRC"
+            CHANGES_MADE=true
         fi
     done
 
     # Verifica PATH per .local/bin
     if ! grep -q 'PATH.*\.local/bin' "$ZSHRC"; then
+        echo '  + Aggiornamento PATH: ~/.local/bin'
         echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$ZSHRC"
-        echo "✓ PATH aggiornato"
+        CHANGES_MADE=true
     fi
 
-    # Verifica alias eza se non presenti
-    if command -v eza &> /dev/null && ! grep -q "alias.*eza" "$ZSHRC"; then
-        cat >> "$ZSHRC" << 'EOF'
+    # Verifica alias eza SPECIFICI (check each one individually)
+    if command -v eza &> /dev/null; then
+        local EZA_SECTION_EXISTS=$(grep -q "# Alias eza" "$ZSHRC" && echo true || echo false)
+
+        # Check for specific new aliases that may be missing
+        if ! grep -q "alias lsga=" "$ZSHRC"; then
+            echo "  + Aggiunta alias: lsga (eza tree with git status)"
+            if [ "$EZA_SECTION_EXISTS" = true ]; then
+                # Add to existing eza section
+                sed -i "/alias lta=/a\    alias lsga='eza --tree --icons --group-directories-first --git'  # tree ALL con git status" "$ZSHRC"
+            else
+                # Create new section with all aliases
+                cat >> "$ZSHRC" << 'EOF'
 
 # Alias eza (modern ls)
 if command -v eza &> /dev/null; then
@@ -695,13 +755,80 @@ if command -v eza &> /dev/null; then
     alias ll='eza -l --icons --group-directories-first'
     alias la='eza -la --icons --group-directories-first'
     alias lt='eza --tree --icons --group-directories-first --git-ignore --ignore-glob="venv|.venv|env|.env|node_modules|.git"'
-    alias lta='eza --tree --icons --group-directories-first'
+    alias lta='eza --tree --icons --group-directories-first'  # tree ALL (senza esclusioni)
+    alias lsga='eza --tree --icons --group-directories-first --git'  # tree ALL con git status
+    alias lsg3='eza --tree --level 3 --icons --group-directories-first --git'  # tree 3 livelli con git status
+    alias lsgm='git status -s'  # solo file modificati (git)
 fi
 EOF
-        echo "✓ Alias eza aggiunti"
+                EZA_SECTION_EXISTS=true
+            fi
+            CHANGES_MADE=true
+        fi
+
+        if ! grep -q "alias lsg3=" "$ZSHRC"; then
+            echo "  + Aggiunta alias: lsg3 (eza tree 3 levels with git)"
+            if [ "$EZA_SECTION_EXISTS" = true ]; then
+                sed -i "/alias lsga=/a\    alias lsg3='eza --tree --level 3 --icons --group-directories-first --git'  # tree 3 livelli con git status" "$ZSHRC"
+            fi
+            CHANGES_MADE=true
+        fi
+
+        if ! grep -q "alias lsgm=" "$ZSHRC"; then
+            echo "  + Aggiunta alias: lsgm (git status -s)"
+            if [ "$EZA_SECTION_EXISTS" = true ]; then
+                sed -i "/alias lsg3=/a\    alias lsgm='git status -s'  # solo file modificati (git)" "$ZSHRC"
+            fi
+            CHANGES_MADE=true
+        fi
     fi
 
-    echo "✓ .zshrc aggiornato (merge)"
+    # Verifica Bun configuration
+    if ! grep -q "BUN_INSTALL" "$ZSHRC"; then
+        echo "  + Aggiunta configurazione Bun"
+        cat >> "$ZSHRC" << 'EOF'
+
+# Bun completions (se installato)
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# Bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+EOF
+        CHANGES_MADE=true
+    fi
+
+    # Verifica dotfiles bare git alias
+    if ! grep -q "alias config=" "$ZSHRC"; then
+        echo "  + Aggiunta alias dotfiles (config)"
+        cat >> "$ZSHRC" << 'EOF'
+
+# Alias per gestire i dotfiles (Bare Git Repository)
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+EOF
+        CHANGES_MADE=true
+    fi
+
+    # Verifica Claude Code environment variables
+    if ! grep -q "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC" "$ZSHRC"; then
+        echo "  + Aggiunta variabili ambiente Claude Code"
+        cat >> "$ZSHRC" << 'EOF'
+
+# Disable non-essential traffic and telemetry
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+export DISABLE_TELEMETRY=1
+export DISABLE_ERROR_REPORTING=1
+EOF
+        CHANGES_MADE=true
+    fi
+
+    if [ "$CHANGES_MADE" = true ]; then
+        echo "✓ .zshrc aggiornato con nuove configurazioni"
+        ZSHRC_UPDATED=true
+    else
+        echo "✓ .zshrc già completo, nessun aggiornamento necessario"
+        ZSHRC_UNCHANGED=true
+    fi
 }
 
 # Helper: aggiungi solo Starship a .zshrc esistente
@@ -861,6 +988,45 @@ verify_installation() {
     echo "==================================="
 }
 
+# Show update summary
+show_update_summary() {
+    # Only show in UPDATE_MODE or if changes were made
+    if [ "$UPDATE_MODE" = true ] || [ "$STARSHIP_UPDATED" = true ] || [ "$ZSHRC_UPDATED" = true ]; then
+        echo ""
+        echo "==================================="
+        echo "📋 Update Summary"
+        echo "==================================="
+
+        # Starship status
+        if [ "$STARSHIP_UPDATED" = true ]; then
+            echo "starship.toml: ✅ Updated"
+        elif [ "$STARSHIP_SKIPPED" = true ]; then
+            echo "starship.toml: ⊘ Skipped (user choice)"
+        elif [ "$STARSHIP_UNCHANGED" = true ]; then
+            echo "starship.toml: ✓ Already up to date"
+        fi
+
+        # Zshrc status
+        if [ "$ZSHRC_UPDATED" = true ]; then
+            echo ".zshrc: ✅ Updated with new configurations"
+            # List what was added (if in verbose mode or always)
+            if [ "$VERBOSE" = true ] || [ "$UPDATE_MODE" = true ]; then
+                echo "  New additions may include:"
+                echo "    • Custom eza aliases (lsga, lsg3, lsgm)"
+                echo "    • Bun configuration"
+                echo "    • Dotfiles git alias (config)"
+                echo "    • Claude Code environment variables"
+            fi
+        elif [ "$ZSHRC_SKIPPED" = true ]; then
+            echo ".zshrc: ⊘ Skipped (user choice)"
+        elif [ "$ZSHRC_UNCHANGED" = true ]; then
+            echo ".zshrc: ✓ Already up to date"
+        fi
+
+        echo "==================================="
+    fi
+}
+
 # Main
 main() {
     install_base_packages
@@ -879,6 +1045,9 @@ main() {
 
     # Verifica installazione
     verify_installation
+
+    # Show update summary
+    show_update_summary
 
     echo -e "\n==================================="
     if [ "$UPDATE_MODE" = true ]; then
@@ -902,6 +1071,12 @@ main() {
     if [ "$UPDATE_MODE" = true ]; then
         echo "💡 TIP: Se hai fatto update, esegui 'source ~/.zshrc' per ricaricare la config"
         echo ""
+    fi
+
+    # Save installed version for tracking
+    if [ -f "$SCRIPT_DIR/VERSION" ]; then
+        RELEASE_VERSION=$(cat "$SCRIPT_DIR/VERSION")
+        echo "$RELEASE_VERSION" > "$HOME/.zsh-starship-config-version"
     fi
 }
 
