@@ -90,6 +90,9 @@ chmod +x install.sh
 ./install.sh
 ```
 
+> [!CAUTION]
+> **DO NOT** use `source ./install.sh` or `. ./install.sh`. This will cause your terminal session to exit when the script finishes. Always run it as an executable: `./install.sh`.
+
 ### Update (v2.1.0+)
 
 **Recommended: Smart Update Script**

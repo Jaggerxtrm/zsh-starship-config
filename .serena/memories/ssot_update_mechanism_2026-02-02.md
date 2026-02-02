@@ -2,17 +2,22 @@
 category: ssot
 domain: configuration-management
 scope: update-mechanism
-version: 1.0.0
+version: 1.1.2
 created: 2026-02-02
 updated: 2026-02-02
-tags: [update, version-tracking, diff-based, configuration]
+tags: [update, version-tracking, diff-based, configuration, robustness, schema, path-priority]
 ---
 
 # SSOT: Update Mechanism
 
 ## Overview
 
-The update mechanism ensures that existing users can safely receive new features and configuration updates without losing their customizations. Implemented in v2.1.0 as a complete rewrite of the update system.
+The update mechanism ensures that existing users can safely receive new features and configuration updates without losing their customizations. Implemented in v2.1.0 as a complete rewrite of the update system, and refined in v2.1.4 for environment reliability.
+
+## Key Reliability Improvements
+
+### PATH Priority (v2.1.4)
+To ensure that local tools like `eza` are correctly detected during shell initialization, the `PATH` export for `~/.local/bin` is now placed at the very top of the `.zshrc` file. This prevents a race condition where aliases were not being defined because the tool was not yet in the `PATH`.
 
 ## Architecture
 
@@ -29,13 +34,16 @@ The update mechanism ensures that existing users can safely receive new features
 │  │ .config-version  │◄─────┤  • Git check     │            │
 │  │ VERSION          │      │  • Version diff  │            │
 │  │ ~/.zsh-...-vers. │      │  • Feature check │            │
-│  └──────────────────┘      └────────┬─────────┘            │
+│  └──────────────────┘      │  • Source guard  │            │
+│                            └────────┬─────────┘            │
 │                                      │                       │
 │                                      ▼                       │
 │  ┌──────────────────────────────────────────────┐          │
 │  │  install.sh --update                         │          │
 │  │  (Core Update Logic)                         │          │
 │  ├──────────────────────────────────────────────┤          │
+│  │  • Anti-Sourcing Guard                       │          │
+│  │  • WSL Interop Guards (cmd, powershell)      │          │
 │  │  • apply_starship_config()                   │          │
 │  │    ├─ diff check                             │          │
 │  │    ├─ backup creation                        │          │
@@ -54,6 +62,20 @@ The update mechanism ensures that existing users can safely receive new features
 │                                                               │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+## Robustness Features (v2.1.1)
+
+### Anti-Sourcing Guard
+To prevent accidental terminal closures, both `update.sh` and `install.sh` include a guard that prevents the script from being executed via `source` or `.`.
+```bash
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+    echo "Error: This script should not be sourced."
+    return 1 2>/dev/null || exit 1
+fi
+```
+
+### WSL Interop Verification
+Before calling Windows-specific binaries (`cmd.exe`, `powershell.exe`) from WSL, the scripts now verify their existence using `command -v`. This prevents the script from terminating abruptly if Windows Interop is disabled.
 
 ## Version Tracking
 

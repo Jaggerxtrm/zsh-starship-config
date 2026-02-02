@@ -1,5 +1,52 @@
 # Changelog
 
+## v2.1.4 - 2026-02-02
+
+### ⚙️ Environment & Alias Fixes
+
+- **PATH Priority Fix**: Moved `PATH` and environment variable exports to the top of the `.zshrc` template. This ensures that local binaries (like `eza`, `starship`, `zoxide`) are available in the search path before the script checks for their existence to define aliases.
+- **Improved Merge Logic**: The installer now intelligently inserts the `~/.local/bin` path at the beginning of existing `.zshrc` files if missing, rather than appending it to the end.
+- **Fixed "lt" command missing**: Resolved an issue where `lt` and other `eza`-based aliases were not being defined because `eza` was not yet in the `PATH` during shell initialization.
+
+---
+
+## v2.1.3 - 2026-02-02
+
+### 📊 Claude Code Schema Fix
+
+- **Missing "type" field**: Added the required `"type": "command"` field to the `statusLine` configuration in `settings.json`. Recent versions of Claude Code require this field to be explicitly defined for the statusline to be valid.
+
+---
+
+## v2.1.2 - 2026-02-02
+
+### 📊 Claude Code Integration Fix
+
+- **Absolute Path for Statusline**: Updated `install.sh` to use the absolute path for the Claude Code statusline command in `settings.json`. This fixes issues where the tilde (`~`) expansion was not being handled correctly by Claude Code, causing the statusline to fail to load.
+
+---
+
+## v2.1.1 - 2026-02-02
+
+### 🛡️ Script Robustness & Bug Fixes
+
+This release focuses on preventing potential terminal crashes and improving the reliability of the update mechanism.
+
+### ✨ Improvements
+
+#### 1. Terminal Crash Prevention
+- **Anti-Sourcing Guard**: Added checks to `update.sh` and `install.sh` to prevent them from being sourced (`source ./update.sh`). Sourcing scripts with `exit` commands could previously cause the terminal session to close abruptly, which users perceived as a crash.
+- **Improved WSL Interop**: Added guards for `powershell.exe` and `cmd.exe` calls in WSL environments. The scripts now gracefully handle cases where Windows Interop is disabled or restricted, preventing script termination.
+
+#### 2. Better Visual Feedback
+- **Color Rendering Fix**: Updated `update.sh` to use literal ESC characters for color variables, ensuring consistent rendering across different terminal emulators and shells.
+- **Smart Update Logic**: Refined the detection of missing features in `.zshrc` to be more precise and informative.
+
+#### 3. Maintenance
+- **Updated Documentation**: Added warnings about not sourcing the scripts in the README.md and UPGRADE.md.
+
+---
+
 ## v2.1.0 - 2026-02-02
 
 ### 🚀 Major Update: Comprehensive Update Mechanism & Version Tracking

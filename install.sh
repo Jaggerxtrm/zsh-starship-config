@@ -4,6 +4,12 @@
 
 set -e
 
+# Prevent sourcing the script (which would exit the terminal session)
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+    echo "Error: This script should not be sourced. Run it as: ./install.sh"
+    return 1 2>/dev/null || exit 1
+fi
+
 # Variabili globali
 UPDATE_MODE=false
 VERBOSE=false
@@ -253,7 +259,11 @@ handle_wsl_fonts() {
         echo "I font devono essere installati anche su Windows per essere usati nel Terminale."
 
         # Trova l'username Windows corrente
-        WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+        if command -v cmd.exe &> /dev/null; then
+            WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+        else
+            WIN_USER=""
+        fi
 
         if [ -n "$WIN_USER" ]; then
             WIN_DEST="/mnt/c/Users/$WIN_USER/Downloads/NerdFonts_Zsh_Setup"
@@ -283,7 +293,7 @@ handle_wsl_fonts() {
             SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
             PS_SCRIPT="$SCRIPT_DIR/scripts/install-fonts-windows.ps1"
 
-            if [ -f "$PS_SCRIPT" ]; then
+            if [ -f "$PS_SCRIPT" ] && command -v powershell.exe &> /dev/null; then
                 echo ""
                 echo "🚀 Installazione automatica font su Windows..."
 
@@ -308,7 +318,11 @@ handle_wsl_fonts() {
                 fi
             else
                 echo ""
-                echo "⚠️  Script PowerShell non trovato. AZIONE RICHIESTA SU WINDOWS:"
+                if [ ! -f "$PS_SCRIPT" ]; then
+                    echo "⚠️  Script PowerShell non trovato. AZIONE RICHIESTA SU WINDOWS:"
+                else
+                    echo "⚠️  powershell.exe non trovato. AZIONE RICHIESTA SU WINDOWS:"
+                fi
                 echo "1. Apri la cartella 'Download/NerdFonts_Zsh_Setup' su Windows"
                 echo "2. Seleziona tutti i file .ttf/.otf"
                 echo "3. Tasto destro → 'Installa' (o 'Installa per tutti gli utenti')"
@@ -477,12 +491,13 @@ EOF
     if [ -f "$HOME/.claude/settings.json" ]; then
         # Backup esistente
         cp "$HOME/.claude/settings.json" "$HOME/.claude/settings.json.backup.$(date +%Y%m%d_%H%M%S)"
-        # Aggiorna solo statusLine usando jq
-        jq '. + {"statusLine": {"command": "~/.claude/hooks/statusline-starship.sh"}}' \
+        # Aggiorna solo statusLine usando jq (usa path assoluto invece di ~)
+        jq --arg cmd "$HOME/.claude/hooks/statusline-starship.sh" \
+            '. + {"statusLine": {"type": "command", "command": $cmd}}' \
             "$HOME/.claude/settings.json" > "$HOME/.claude/settings.json.tmp" && \
             mv "$HOME/.claude/settings.json.tmp" "$HOME/.claude/settings.json"
     else
-        echo '{"statusLine": {"command": "~/.claude/hooks/statusline-starship.sh"}}' > "$HOME/.claude/settings.json"
+        echo "{\"statusLine\": {\"type\": \"command\", \"command\": \"$HOME/.claude/hooks/statusline-starship.sh\"}}" > "$HOME/.claude/settings.json"
     fi
 
     echo "✓ Claude Code status line configurata (Enhanced)"
@@ -612,6 +627,12 @@ configure_zshrc() {
 # Helper: crea .zshrc completo da zero
 create_new_zshrc() {
     cat > "$HOME/.zshrc" << 'EOF'
+# PATH and Environment
+export PATH="$HOME/.local/bin:$PATH"
+export NVM_DIR="$HOME/.nvm"
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
 # Oh My Zsh configuration
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME=""
@@ -687,22 +708,21 @@ if command -v starship &> /dev/null; then
 fi
 
 # NVM (se installato)
-export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# PATH
-export PATH="$HOME/.local/bin:$PATH"
 
 # Bun completions (se installato)
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
-# Bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
 # Alias per gestire i dotfiles (Bare Git Repository)
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+
+# Disable non-essential traffic and telemetry
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+export DISABLE_TELEMETRY=1
+export DISABLE_ERROR_REPORTING=1
+EOF
+}
 
 # Disable non-essential traffic and telemetry
 export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
@@ -728,10 +748,10 @@ merge_zshrc_config() {
         fi
     done
 
-    # Verifica PATH per .local/bin
+    # Verifica PATH per .local/bin (Aggiungi all'inizio se mancante)
     if ! grep -q 'PATH.*\.local/bin' "$ZSHRC"; then
         echo '  + Aggiornamento PATH: ~/.local/bin'
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$ZSHRC"
+        sed -i '1i export PATH="$HOME/.local/bin:$PATH"' "$ZSHRC"
         CHANGES_MADE=true
     fi
 

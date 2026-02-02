@@ -1,10 +1,24 @@
 # Configuration Version Tracking
 # This file tracks the versions of individual configuration components
 
-STARSHIP_CONFIG_VERSION=2.1.0
-ZSHRC_TEMPLATE_VERSION=2.1.0
+STARSHIP_CONFIG_VERSION=2.1.4
+ZSHRC_TEMPLATE_VERSION=2.1.4
 
 # Version History:
+# 2.1.4 (2026-02-02)
+#   - PATH priority fix (moved to top of .zshrc)
+#   - Fixed eza aliases detection
+#
+# 2.1.3 (2026-02-02)
+#   - Add required "type": "command" to Claude statusLine config
+#
+# 2.1.2 (2026-02-02)
+#   - Use absolute paths for Claude Code statusline in settings.json
+#
+# 2.1.1 (2026-02-02)
+#   - Script robustness (anti-sourcing, WSL interop checks)
+#   - Color rendering fixes in update.sh
+#
 # 2.1.0 (2026-02-02)
 #   - Added custom eza aliases (lsga, lsg3, lsgm)
 #   - Added Bun configuration
