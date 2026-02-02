@@ -1,5 +1,136 @@
 # Changelog
 
+## v2.1.0 - 2026-02-02
+
+### 🚀 Major Update: Comprehensive Update Mechanism & Version Tracking
+
+This release implements a robust update system that ensures existing users receive new features and fixes automatically.
+
+### ✨ New Features
+
+#### 1. Version Tracking System
+- **`.config-version`**: Tracks individual component versions (starship.toml v2.1.0, .zshrc template v2.1.0)
+- **Version history**: Maintains changelog of configuration changes
+- **Installed version tracking**: Stores version in `~/.zsh-starship-config-version`
+- **Version comparison**: Smart update decisions based on version differences
+
+#### 2. Smart Diff-Based Updates (install.sh)
+- **Intelligent starship.toml updates**:
+  - ✅ Uses `diff` to check for actual changes (no blind overwriting)
+  - ✅ Creates automatic timestamped backups before updating
+  - ✅ Asks user confirmation in normal mode
+  - ✅ Auto-updates in `--update` mode
+  - ✅ Tracks update status (updated/skipped/unchanged)
+
+- **Enhanced .zshrc merge**:
+  - ✅ Checks **each** alias individually (not just "any eza alias")
+  - ✅ Detects missing features: lsga, lsg3, lsgm, Bun config, dotfiles alias, Claude Code env vars
+  - ✅ Adds only missing features (no duplication)
+  - ✅ Preserves user customizations
+
+- **Update summary report**:
+  - Shows what was updated/skipped/unchanged
+  - Lists new features added to .zshrc
+  - Displayed in both update and normal modes
+
+#### 3. Dedicated update.sh Script (Completely Rewritten)
+- **Git repository check**: Fetches updates and shows recent commits
+- **Pre-update configuration check**: Lists exactly what's missing before updating
+- **Version comparison**: Shows installed vs available versions
+- **Feature detection**: Lists missing .zshrc features (lsga, lsg3, lsgm, Bun, dotfiles, Claude vars)
+- **Colored output**: Better UX with green/yellow/red/blue indicators
+- **Confirmation prompts**: User control before making changes
+- **Post-update instructions**: Clear next steps after update
+
+### 🐛 Bug Fixes (GitHub Issue #1)
+
+#### Directory Handling in install.sh
+- **Root cause**: `install_nerd_fonts()` changed to `/tmp` but never returned
+- **Fix**: Added `SCRIPT_DIR` global variable and directory restoration
+- **Impact**: Script now works from any working directory
+
+**Changes:**
+- Added `SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"` global variable (line 10)
+- Added directory restoration in `install_nerd_fonts()` (lines 165, 237)
+- Added directory restoration in `update_eza_from_github()` (lines 362, 378)
+- Changed to absolute path: `$SCRIPT_DIR/starship.toml` (line 507)
+
+### 📊 System Customizations Synced (System → Repository)
+
+#### New .zshrc Template Features
+- **Custom eza aliases**:
+  - `lsga`: Tree view with git status
+  - `lsg3`: 3-level tree with git status
+  - `lsgm`: Git status short format (`git status -s`)
+
+- **Runtime configurations**:
+  - Bun completions and PATH setup
+  - Dotfiles bare git repository alias (`config` command)
+  - Claude Code telemetry disabling environment variables
+
+### 📝 Documentation Updates
+
+- **Prompt symbol**: Updated `⮕` → `>` in EXAMPLES.md, QUICK_START.md, README.md
+- **Matches configuration**: `success_symbol = "[>](bold green)"`, `error_symbol = "[>](bold red)"`
+
+### 🔧 Technical Details
+
+**Update Tracking Variables**:
+```bash
+STARSHIP_UPDATED/SKIPPED/UNCHANGED
+ZSHRC_UPDATED/SKIPPED/UNCHANGED
+```
+
+**New Functions**:
+- `show_update_summary()`: Displays update report
+- Enhanced `merge_zshrc_config()`: Specific feature detection
+- Improved `apply_starship_config()`: Diff-based updates
+
+### 📦 Files Changed
+
+**New Files:**
+- `.config-version` - Component version tracking
+- Enhanced `update.sh` (+177 lines) - Complete rewrite
+
+**Updated Files:**
+- `VERSION` - 1.7.0 → 2.1.0
+- `install.sh` (+175 lines) - Smart diff updates + summary
+- `EXAMPLES.md`, `QUICK_START.md`, `README.md` - Prompt symbol updates
+
+### 🎯 Impact on Existing Users
+
+**Before v2.1.0:**
+- ❌ starship.toml: Always overwritten (no backup, no choice)
+- ❌ New aliases: Ignored (only checked "any eza alias")
+- ❌ New features: Never propagated to existing users
+- ❌ No version tracking
+
+**After v2.1.0:**
+- ✅ starship.toml: Diff-based update with backups
+- ✅ Each feature checked individually
+- ✅ New features automatically added
+- ✅ Version tracking enables smart decisions
+
+### 💡 Usage
+
+**For existing users:**
+```bash
+./update.sh              # Smart update with version check (recommended)
+# OR
+./install.sh --update    # Direct update mode
+```
+
+**Check version:**
+```bash
+cat ~/.zsh-starship-config-version  # Shows: 2.1.0
+```
+
+### 🔗 References
+- Fixes #1 (GitHub Issue)
+- Related commits: 88a0496, df4e699
+
+---
+
 ## v2.0.0 - 2026-02-01
 
 ### 🎉 Major Release: Update System & Smart Configuration

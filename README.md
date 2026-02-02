@@ -46,6 +46,9 @@ Example:
 **Smart Aliases:**
 - `lt`: Tree view excluding venv, node_modules, and .git
 - `lta`: Complete tree view without exclusions
+- `lsga`: Tree view with git status **[NEW in v2.1.0]**
+- `lsg3`: 3-level tree with git status **[NEW in v2.1.0]**
+- `lsgm`: Git status short format (`git status -s`) **[NEW in v2.1.0]**
 
 ## Requirements
 
@@ -88,26 +91,47 @@ chmod +x install.sh
 ./install.sh
 ```
 
-### Update
+### Update (v2.1.0+)
 
-If a previous version is already installed:
+**Recommended: Smart Update Script**
+
+```bash
+cd ~/projects/zsh-starship-config
+./update.sh
+```
+
+**What it does:**
+1. ✅ Checks for repository updates (git fetch)
+2. ✅ Shows recent changes before updating
+3. ✅ Compares installed vs available version
+4. ✅ Lists exactly what's missing (new aliases, configs, etc.)
+5. ✅ Asks for confirmation before updating
+6. ✅ Creates automatic backups of configurations
+7. ✅ Shows update summary after completion
+
+**Or use direct update mode:**
 
 ```bash
 cd ~/projects/zsh-starship-config
 git pull
 ./install.sh --update
-# Or use the wrapper:
-./update.sh
 ```
 
-**Update Mode Features:**
-- Updates Starship, eza, and other components
-- **Does not overwrite** your `.zshrc` (smart merge)
-- Automatic backup of all configurations
-- (WSL) Automatic font installation on Windows
-- Post-installation verification
+**Update Mode Features (v2.1.0):**
+- ✅ **Version tracking**: Knows what version you have installed
+- ✅ **Smart diff checking**: Only updates changed files
+- ✅ **Incremental updates**: Adds missing features without overwriting
+- ✅ **Automatic backups**: Timestamped backups before any change
+- ✅ **Feature detection**: Detects and adds new aliases (lsga, lsg3, lsgm)
+- ✅ **Configuration preservation**: Your customizations are safe
+- ✅ **Update summary**: Shows what was updated/skipped
 
-See [UPGRADE.md](UPGRADE.md) for the complete upgrade guide.
+**Check your current version:**
+```bash
+cat ~/.zsh-starship-config-version  # Shows: 2.1.0
+```
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and [UPGRADE.md](UPGRADE.md) for detailed upgrade guide.
 
 ### Available Options
 
