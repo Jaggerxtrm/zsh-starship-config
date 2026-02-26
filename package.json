@@ -15,6 +15,7 @@
     "install.sh",
     "update.sh",
     "starship.toml",
+    "starship-pure.toml",
     "README.md",
     "QUICK_START.md",
     "EXAMPLES.md",
