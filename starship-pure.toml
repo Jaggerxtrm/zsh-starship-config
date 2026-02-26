@@ -5,21 +5,20 @@
 # Timeout for commands (in milliseconds)
 command_timeout = 500
 
-# Format of the prompt
-format = """
-$username$hostname$directory$git_branch$git_status$python
-$character"""
+# Format of the prompt (single line)
+format = """$directory$git_branch$git_status$git_state$python$character"""
+right_format = """$username$hostname"""
 
-# Prompt character (Matched to Host/Git)
+# Prompt character (classic $)
 [character]
-success_symbol = "[>](bold green)"
-error_symbol = "[>](bold red)"
+success_symbol = "[\\$](bold white)"
+error_symbol = "[\\$](bold red)"
 
 # Username (white text)
 [username]
-style_user = "white"
-style_root = "#f7768e"   # Tokyo Night red
-format = "[$user]($style)@"
+style_user = "bold white"
+style_root = "bold #f7768e"   # Tokyo Night red
+format = "[$user@]($style)"
 disabled = false
 show_always = true
 
@@ -35,29 +34,41 @@ disabled = false
 truncation_length = 3
 truncate_to_repo = true
 format = "[$read_only]($read_only_style)[$path]($style) "
-style = "white"
+style = "bold white"
 read_only = " 󰌾"
 home_symbol = "home"
 
+# Git state (rebase, merge, cherry-pick, etc.)
+[git_state]
+format = '[$state( $progress_current/$progress_total)]($style) '
+style = "bold yellow"
+rebase = "rebase"
+merge = "merge"
+revert = "revert"
+cherry_pick = "cherry-pick"
+bisect = "bisect"
+am = "am"
+am_or_rebase = "am/rebase"
+
 # Git branch (with proper git icon)
 [git_branch]
-format = "[\uf09b $branch]($style) "
-style = "cyan"  # Matches hostname (not bold)
+format = "[$branch]($style)"
+style = "bold color(242)"
 
 # Git status (detailed icons)
 [git_status]
-format = '([$all_status$ahead_behind]($style) )'
-style = "green"  # Matches hostname (not bold)
-conflicted = "\uf0ec "
-ahead = "\uf0aa${count} "
-behind = "\uf0ab${count} "
-diverged = "\uf0ec \uf0aa${ahead_count}\uf0ab${behind_count} "
-untracked = "\uf059 "
-stashed = "\uf448 "
-modified = "\uf040 "
-staged = "\uf00c${count} "
-renamed = "\uf02b "
-deleted = "\uf05e "
+format = '[$all_status$ahead_behind]($style) '
+style = "bold green"
+conflicted = "*"
+ahead = "⇡"
+behind = "⇣"
+diverged = "⇡⇣"
+untracked = "*"
+stashed = "≡"
+modified = "*"
+staged = "*"
+renamed = "*"
+deleted = "*"
 
 # Programming languages (shown only when relevant)
 [nodejs]
