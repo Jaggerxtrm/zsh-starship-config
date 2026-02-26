@@ -522,32 +522,93 @@ install_modern_tools() {
     fi
 }
 
+# Mostra il menu di scelta del tema Starship
+choose_starship_theme() {
+    echo "" >&2
+    echo "┌─────────────────────────────────────────────────────────────┐" >&2
+    echo "│              Choose your Starship prompt theme              │" >&2
+    echo "├─────────────────────────────────────────────────────────────┤" >&2
+    echo "│                                                             │" >&2
+    echo "│  1) Classic  (Nerd Fonts icons, two-line, full info)       │" >&2
+    echo "│                                                             │" >&2
+    echo "│     dawid@fedora ~/dev/myproject  master  ↑2              │" >&2
+    echo "│     >                                                       │" >&2
+    echo "│                                                             │" >&2
+    echo "│     • Nerd Font icons for git, languages, status           │" >&2
+    echo "│     • Two-line layout with username@host always visible    │" >&2
+    echo "│     • Requires a Nerd Font in your terminal                │" >&2
+    echo "│                                                             │" >&2
+    echo "├─────────────────────────────────────────────────────────────┤" >&2
+    echo "│                                                             │" >&2
+    echo "│  2) Pure     (minimal symbols, single-line, right prompt)  │" >&2
+    echo "│                                                             │" >&2
+    echo "│     ~/dev/myproject master*⇡          dawid@fedora        │" >&2
+    echo "│     \$                                                       │" >&2
+    echo "│                                                             │" >&2
+    echo "│     • Pure-style git symbols: * ⇡ ⇣ ⇡⇣ ≡                 │" >&2
+    echo "│     • username@host moved to right prompt                  │" >&2
+    echo "│     • Works with any monospace font                        │" >&2
+    echo "│                                                             │" >&2
+    echo "└─────────────────────────────────────────────────────────────┘" >&2
+    echo "" >&2
+
+    local chosen_config=""
+    while true; do
+        read -p "Choose theme [1/2]: " -n 1 -r THEME_CHOICE
+        echo >&2
+        case "$THEME_CHOICE" in
+            1)
+                chosen_config="$SCRIPT_DIR/starship.toml"
+                echo "✓ Classic theme selected" >&2
+                break
+                ;;
+            2)
+                chosen_config="$SCRIPT_DIR/starship-pure.toml"
+                echo "✓ Pure theme selected" >&2
+                break
+                ;;
+            *)
+                echo "Please enter 1 or 2." >&2
+                ;;
+        esac
+    done
+
+    echo "$chosen_config"
+}
+
 # Applica configurazione Starship
 apply_starship_config() {
     echo -e "\n⚙️  Applicazione configurazione Starship..."
 
     mkdir -p "$HOME/.config"
 
+    # Let user choose theme (skip in update mode to avoid disrupting existing config)
+    if [ "$UPDATE_MODE" = true ]; then
+        CHOSEN_CONFIG="$SCRIPT_DIR/starship.toml"
+    else
+        CHOSEN_CONFIG=$(choose_starship_theme)
+    fi
+
     # Check if file exists and differs
     if [ -f "$HOME/.config/starship.toml" ]; then
-        if ! diff -q "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml" &>/dev/null; then
+        if ! diff -q "$CHOSEN_CONFIG" "$HOME/.config/starship.toml" &>/dev/null; then
             echo "⚠️  starship.toml differs from repository version"
 
             if [ "$UPDATE_MODE" = true ]; then
                 # Automatic backup and update in update mode
                 BACKUP="$HOME/.config/starship.toml.backup.$(date +%Y%m%d_%H%M%S)"
                 cp "$HOME/.config/starship.toml" "$BACKUP"
-                cp "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
+                cp "$CHOSEN_CONFIG" "$HOME/.config/starship.toml"
                 echo "✓ starship.toml updated (backup: $BACKUP)"
                 STARSHIP_UPDATED=true
             else
                 # Ask user in normal mode
-                read -p "Update starship.toml? Your changes will be backed up. (s/N) " -n 1 -r
+                read -p "Apply this theme? Your current config will be backed up. (s/N) " -n 1 -r
                 echo
                 if [[ $REPLY =~ ^[Ss]$ ]]; then
                     BACKUP="$HOME/.config/starship.toml.backup.$(date +%Y%m%d_%H%M%S)"
                     cp "$HOME/.config/starship.toml" "$BACKUP"
-                    cp "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
+                    cp "$CHOSEN_CONFIG" "$HOME/.config/starship.toml"
                     echo "✓ starship.toml updated (backup: $BACKUP)"
                     STARSHIP_UPDATED=true
                 else
@@ -561,7 +622,7 @@ apply_starship_config() {
         fi
     else
         # New installation
-        cp "$SCRIPT_DIR/starship.toml" "$HOME/.config/starship.toml"
+        cp "$CHOSEN_CONFIG" "$HOME/.config/starship.toml"
         echo "✓ starship.toml created"
         STARSHIP_UPDATED=true
     fi
@@ -669,11 +730,6 @@ if [ -f /usr/share/fzf/shell/key-bindings.zsh ]; then
     export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :500 {} 2>/dev/null || cat {}'"
 fi
 
-# Zoxide initialization (se disponibile)
-if command -v zoxide &> /dev/null; then
-    eval "$(zoxide init zsh)"
-fi
-
 # Alias moderni (se i tool sono disponibili)
 if command -v eza &> /dev/null; then
     alias ls='eza --icons --group-directories-first'
@@ -721,13 +777,11 @@ alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 export DISABLE_TELEMETRY=1
 export DISABLE_ERROR_REPORTING=1
-EOF
-}
 
-# Disable non-essential traffic and telemetry
-export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
-export DISABLE_TELEMETRY=1
-export DISABLE_ERROR_REPORTING=1
+# Zoxide initialization (must be last)
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+fi
 EOF
 }
 
@@ -840,6 +894,21 @@ export DISABLE_TELEMETRY=1
 export DISABLE_ERROR_REPORTING=1
 EOF
         CHANGES_MADE=true
+    fi
+
+    # Verifica zoxide init (deve essere ULTIMO)
+    if ! grep -q "zoxide init zsh" "$ZSHRC"; then
+        echo "  + Aggiunta zoxide init (in fondo al file)"
+        cat >> "$ZSHRC" << 'EOF'
+
+# Zoxide initialization (must be last)
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+fi
+EOF
+        CHANGES_MADE=true
+    elif ! tail -15 "$ZSHRC" | grep -q "zoxide init zsh"; then
+        echo "  ⚠️  zoxide init trovato ma non in fondo al file — sposta manualmente alla fine di .zshrc"
     fi
 
     if [ "$CHANGES_MADE" = true ]; then
