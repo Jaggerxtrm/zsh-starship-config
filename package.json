@@ -1,0 +1,42 @@
+{
+  "name": "zsh-starship-config",
+  "version": "2.0.0",
+  "description": "Automated Zsh + Starship + Nerd Fonts setup via npx",
+  "bin": {
+    "zsh-starship-config": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "echo "Error: no test specified" && exit 1"
+  },
+  "files": [
+    "bin",
+    "data",
+    "scripts",
+    "install.sh",
+    "update.sh",
+    "starship.toml",
+    "README.md",
+    "QUICK_START.md",
+    "EXAMPLES.md",
+    "CHANGELOG.md",
+    "UPGRADE.md",
+    "LICENSE"
+  ],
+  "author": "Dawid",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jaggerxtrm/zsh-starship-config.git"
+  },
+  "keywords": [
+    "zsh",
+    "starship",
+    "cli",
+    "terminal",
+    "customization",
+    "installer"
+  ],
+  "engines": {
+    "node": ">=14"
+  }
+}

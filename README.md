@@ -82,7 +82,15 @@ If the automatic installation fails:
 
 ## Quick Installation
 
-### Automatic Installation
+### via npx (Recommended)
+
+No git clone required! Run directly from npm:
+
+```bash
+npx zsh-starship-config
+```
+
+### Manual Installation (Git Clone)
 
 ```bash
 cd ~/projects/zsh-starship-config

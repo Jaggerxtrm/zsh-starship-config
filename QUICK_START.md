@@ -2,6 +2,12 @@
 
 ## Installazione Automatica
 
+### Via npx (Raccomandato)
+```bash
+npx zsh-starship-config
+```
+
+### Via Git
 ```bash
 cd ~/projects/zsh-starship-config
 ./install.sh
