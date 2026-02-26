@@ -159,7 +159,7 @@ install_starship() {
         else
             read -p "Do you want to update Starship? (y/N) " -n 1 -r
             echo
-            if [[ $REPLY =~ ^[Ss]$ ]]; then
+            if [[ $REPLY =~ ^[YySs]$ ]]; then
                 curl -sS https://starship.rs/install.sh | sh -s -- -y --force
                 NEW_VERSION=$(starship --version | grep -oP 'starship \K[\d.]+' || echo "unknown")
                 echo "✓ Starship updated to v$NEW_VERSION"
@@ -354,7 +354,7 @@ install_eza() {
         else
             read -p "Do you want to update eza? (y/N) " -n 1 -r
             echo
-            if [[ $REPLY =~ ^[Ss]$ ]]; then
+            if [[ $REPLY =~ ^[YySs]$ ]]; then
                 if [ "$OS" = "fedora" ] && sudo dnf list installed eza &> /dev/null; then
                     sudo dnf update -y eza
                 else
@@ -512,7 +512,7 @@ install_modern_tools() {
 
     read -p "Do you want to install bat, ripgrep, fd, zoxide? (y/N) " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Ss]$ ]]; then
+    if [[ $REPLY =~ ^[YySs]$ ]]; then
         if [ "$OS" = "fedora" ]; then
             sudo dnf install -y bat ripgrep fd-find zoxide fzf
         elif [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
@@ -605,7 +605,7 @@ apply_starship_config() {
                 # Ask user in normal mode
                 read -p "Apply this theme? Your current config will be backed up. (y/N) " -n 1 -r
                 echo
-                if [[ $REPLY =~ ^[Ss]$ ]]; then
+                if [[ $REPLY =~ ^[YySs]$ ]]; then
                     BACKUP="$HOME/.config/starship.toml.backup.$(date +%Y%m%d_%H%M%S)"
                     cp "$HOME/.config/starship.toml" "$BACKUP"
                     cp "$CHOSEN_CONFIG" "$HOME/.config/starship.toml"
@@ -656,7 +656,7 @@ configure_zshrc() {
         if [ "$UPDATE_MODE" = true ]; then
             read -p "Do you want to completely overwrite .zshrc? (y/N) " -n 1 -r
             echo
-            if [[ $REPLY =~ ^[Ss]$ ]]; then
+            if [[ $REPLY =~ ^[YySs]$ ]]; then
                 create_new_zshrc
                 echo "✓ .zshrc overwritten"
                 ZSHRC_UPDATED=true
@@ -674,7 +674,7 @@ configure_zshrc() {
         echo "⚠️  Existing .zshrc without Starship configuration"
         read -p "Do you want to overwrite .zshrc? (y=overwrite, N=add Starship) " -n 1 -r
         echo
-        if [[ $REPLY =~ ^[Ss]$ ]]; then
+        if [[ $REPLY =~ ^[YySs]$ ]]; then
             create_new_zshrc
             echo "✓ .zshrc overwritten"
             ZSHRC_UPDATED=true
@@ -951,7 +951,7 @@ change_shell_to_zsh() {
     else
         read -p "Do you want to set Zsh as default shell? (y/N) " -n 1 -r
         echo
-        if [[ $REPLY =~ ^[Ss]$ ]]; then
+        if [[ $REPLY =~ ^[YySs]$ ]]; then
             chsh -s "$(which zsh)"
             echo "✓ Shell changed to Zsh (requires logout)"
         fi
