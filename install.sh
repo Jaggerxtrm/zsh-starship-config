@@ -665,7 +665,8 @@ configure_zshrc() {
                 merge_zshrc_config  # This sets ZSHRC_UPDATED or ZSHRC_UNCHANGED
             fi
         else
-            # Modalità normale: aggiungi solo elementi mancanti
+            # Modalità normale: aggiungi solo elementi mancanti (senza backup inutile)
+            rm -f "$BACKUP"
             merge_zshrc_config  # This sets ZSHRC_UPDATED or ZSHRC_UNCHANGED
         fi
     else
@@ -811,7 +812,7 @@ merge_zshrc_config() {
 
     # Verifica alias eza SPECIFICI (check each one individually)
     if command -v eza &> /dev/null; then
-        local EZA_SECTION_EXISTS=$(grep -q "# Alias eza" "$ZSHRC" && echo true || echo false)
+        local EZA_SECTION_EXISTS=$(grep -q "alias ls=.*eza" "$ZSHRC" && echo true || echo false)
 
         # Check for specific new aliases that may be missing
         if ! grep -q "alias lsga=" "$ZSHRC"; then
