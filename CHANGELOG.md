@@ -1,5 +1,49 @@
 # Changelog
 
+## v2.2.0 - 2026-02-26
+
+### 🎨 New: Pure Theme + npx Installer + Bug Fixes
+
+#### Pure Starship Theme (`starship-pure.toml`)
+- **New minimal theme** inspired by [sindresorhus/pure](https://github.com/sindresorhus/pure)
+- Git status uses Unicode symbols: `*` (dirty), `⇡` (ahead), `⇣` (behind), `⇡⇣` (diverged), `≡` (stash)
+- Git state indicator for in-progress operations: `rebase`, `merge`, `cherry-pick`, etc.
+- Branch name in muted gray (`color(242)`), no icon required
+- `user@host` moved to right prompt — keeps left side minimal, info always visible
+- Bold styles throughout; works with any monospace font (no Nerd Font required)
+- `*` attaches directly to branch name (no space), space always present in clean repos
+
+#### npx Installer
+- **Run without cloning**: `npx -y github:Jaggerxtrm/zsh-starship-config`
+- Added `package.json` and `bin/cli.js` entry point
+- Theme selection prompt shown at install time with ASCII previews of both themes
+
+#### Theme Selection at Install Time
+- Interactive menu with side-by-side ASCII preview of Classic vs Pure themes
+- Skipped in `--update` mode to avoid disrupting existing config
+- All UI output correctly redirected to stderr so path capture via `$()` works correctly
+
+#### Bug Fixes
+- **`.zshrc` block multiplication**: `EZA_SECTION_EXISTS` guard was checking `# Alias eza` but
+  `create_new_zshrc()` writes `# Alias moderni` — mismatch caused full eza block to be appended
+  on every installer run. Fixed to use `alias ls=.*eza` pattern which matches both styles.
+- **Unnecessary backup on merge**: Backup was created unconditionally even when only merging
+  missing config (no overwrite). Now removed if no overwrite happens.
+- **Zoxide init placement**: Moved `eval "$(zoxide init zsh)"` to end of `.zshrc` in both
+  `create_new_zshrc()` template and `merge_zshrc_config()` check (zoxide requires this).
+- **Missing zoxide check in merge**: `merge_zshrc_config()` now detects and appends zoxide
+  init if absent, with a warning if found but not at end of file.
+- **Duplicate heredoc block**: Removed orphaned `export DISABLE_* / EOF / }` lines left after
+  `create_new_zshrc()` — would have caused a syntax error at runtime.
+- **`choose_starship_theme()` stdout pollution**: All `echo` statements redirected to stderr;
+  only the final file path goes to stdout so `CHOSEN_CONFIG=$(...)` captures correctly.
+- **`starship-pure.toml` missing from npm `files`**: Added to `package.json` files array so
+  npx includes it in the fetched package.
+- **`package.json` JSON syntax error**: Unescaped inner quotes in test script caused
+  `EJSONPARSE` on every `npx` invocation.
+
+---
+
 ## v2.1.4 - 2026-02-02
 
 ### ⚙️ Environment & Alias Fixes
