@@ -52,7 +52,7 @@ am_or_rebase = "am/rebase"
 
 # Git branch (with proper git icon)
 [git_branch]
-format = "[$branch]($style)"
+format = ":[$branch]($style)"
 style = "bold color(242)"
 
 # Git status (detailed icons)
