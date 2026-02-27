@@ -1,63 +1,42 @@
 # Starship configuration
-# Tema: Ocean Blue + Tokyo Night (ibrido personalizzato)
-# Font richiesto: MesloLGS NF o JetBrainsMono Nerd Font
+# Style: Pure (no spaces between sections)
 
-# Timeout for commands (in milliseconds)
 command_timeout = 500
 
-# Format of the prompt (single line)
 format = """$directory$git_branch$git_status$git_state$python$character"""
 right_format = """$username$hostname"""
 
-# Prompt character (classic $)
 [character]
 success_symbol = "[\\$](bold white)"
 error_symbol = "[\\$](bold red)"
 
-# Username (white text)
 [username]
 style_user = "bold white"
-style_root = "bold #f7768e"   # Tokyo Night red
+style_root = "bold #f7768e"
 format = "[$user@]($style)"
 disabled = false
 show_always = true
 
-# Hostname (to distinguish local vs VPS)
 [hostname]
-ssh_only = false          # show always, not just SSH
-format = "[$hostname]($style) "
-style = "bold cyan"      # cyan for local, you can customize per VPS
+ssh_only = false
+format = "[$hostname]($style)"
+style = "bold cyan"
 disabled = false
 
-# Directory (white text)
 [directory]
 truncation_length = 3
 truncate_to_repo = true
-format = "[$read_only]($read_only_style)[$path]($style) "
+format = "[$read_only]($read_only_style)[$path]($style)"
 style = "bold white"
 read_only = " 󰌾"
 home_symbol = "home"
 
-# Git state (rebase, merge, cherry-pick, etc.)
-[git_state]
-format = '[$state( $progress_current/$progress_total)]($style) '
-style = "bold yellow"
-rebase = "rebase"
-merge = "merge"
-revert = "revert"
-cherry_pick = "cherry-pick"
-bisect = "bisect"
-am = "am"
-am_or_rebase = "am/rebase"
-
-# Git branch (with proper git icon)
 [git_branch]
 format = ":[$branch]($style)"
 style = "bold color(242)"
 
-# Git status (detailed icons)
 [git_status]
-format = '[$all_status$ahead_behind]($style) '
+format = '[$all_status$ahead_behind]($style)'
 style = "bold green"
 conflicted = "*"
 ahead = "⇡"
@@ -70,41 +49,29 @@ staged = "*"
 renamed = "*"
 deleted = "*"
 
-# Programming languages (shown only when relevant)
-[nodejs]
-symbol = " "
-format = "via [$symbol($version )]($style)"
+[git_state]
+format = '[$state( $progress_current/$progress_total)]($style)'
+style = "bold yellow"
+rebase = "rebase"
+merge = "merge"
+revert = "revert"
+cherry_pick = "cherry-pick"
+bisect = "bisect"
+am = "am"
+am_or_rebase = "am/rebase"
 
 [python]
 symbol = ""
-format = "[($virtualenv )]($style)"
-style = "#e0af68"  # Tokyo Night yellow
+format = "[($virtualenv)]($style)"
+style = "#e0af68"
 detect_extensions = ["py"]
 detect_files = [".python-version", "Pipfile", "requirements.txt", "pyproject.toml", "setup.py"]
 detect_folders = []
 
-[rust]
-symbol = " "
-format = "via [$symbol($version )]($style)"
-
-[golang]
-symbol = " "
-format = "via [$symbol($version )]($style)"
-
-[php]
-symbol = " "
-format = "via [$symbol($version )]($style)"
-
-[java]
-symbol = " "
-format = "via [$symbol($version )]($style)"
-
-# Command duration (Tokyo Night theme - no bold)
 [cmd_duration]
 min_time = 2000
-format = "took [$duration]($style) "
-style = "#e0af68"  # Tokyo Night yellow
+format = "took[$duration]($style)"
+style = "#e0af68"
 
-# Time
 [time]
 disabled = true
