@@ -1354,13 +1354,29 @@ install_tmux() {
     chmod +x "$HOME/.tmux/apply-theme-hook.sh"
     echo "✓ Tmux themes installed (cobalt, green, blue, purple, orange, red, nord, everforest, gruvbox)"
 
-    # Install TPM plugins headless
-    if [ -f "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
-        echo "Installing TPM plugins..."
-        TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins" \
-            "$HOME/.tmux/plugins/tpm/bin/install_plugins" 2>/dev/null
-        echo "✓ Plugins installed (tmux-sensible, tmux-yank, tmux-resurrect, tmux-continuum)"
-    fi
+    # Install TPM plugins by cloning directly (no tmux server required)
+    echo "Installing TPM plugins..."
+    local PLUGINS=(
+        "tmux-plugins/tmux-sensible"
+        "tmux-plugins/tmux-yank"
+        "tmux-plugins/tmux-resurrect"
+        "tmux-plugins/tmux-continuum"
+    )
+    for plugin in "${PLUGINS[@]}"; do
+        plugin_name=$(basename "$plugin")
+        plugin_dir="$HOME/.tmux/plugins/$plugin_name"
+        if [ ! -d "$plugin_dir" ]; then
+            git clone --depth=1 "https://github.com/$plugin" "$plugin_dir" 2>/dev/null
+            echo "  ✓ $plugin_name"
+        else
+            if [ "$UPDATE_MODE" = true ]; then
+                git -C "$plugin_dir" pull --quiet 2>/dev/null && echo "  ✓ $plugin_name updated"
+            else
+                echo "  ✓ $plugin_name already installed"
+            fi
+        fi
+    done
+    echo "✓ Plugins installed"
 }
 
 # Main
