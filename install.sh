@@ -708,18 +708,25 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# Syntax highlighting colors - Green Theme (Custom)
-ZSH_HIGHLIGHT_STYLES[command]='fg=green'                        # Valid commands: standard green (no bold)
-ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#f7768e,bold'           # Invalid: Tokyo Night red
-ZSH_HIGHLIGHT_STYLES[builtin]='fg=#bb9af7'                      # Built-in: soft violet
-ZSH_HIGHLIGHT_STYLES[alias]='fg=#73daca,bold'                   # Aliases: teal green (teal)
-ZSH_HIGHLIGHT_STYLES[path]='fg=white'                           # Path: white (no underline)
-ZSH_HIGHLIGHT_STYLES[globbing]='fg=#bb9af7'                     # Glob: soft violet
-ZSH_HIGHLIGHT_STYLES[precommand]='fg=#7dcfff,bold'              # sudo, time: cyan (for attention)
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#e0af68'       # 'string': Tokyo Night yellow
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#e0af68'       # "string": Tokyo Night yellow
-ZSH_HIGHLIGHT_STYLES[redirection]='fg=#bb9af7'                  # >, <, |: soft violet
-ZSH_HIGHLIGHT_STYLES[comment]='fg=#56b6c2,italic'               # # comments: dark cyan
+# Syntax highlighting — neutral, works on any tmux theme background
+ZSH_HIGHLIGHT_STYLES[command]='bold'
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#cc7832,bold'
+ZSH_HIGHLIGHT_STYLES[builtin]='bold'
+ZSH_HIGHLIGHT_STYLES[alias]='bold,underline'
+ZSH_HIGHLIGHT_STYLES[path]='underline'
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=#9a8060'
+ZSH_HIGHLIGHT_STYLES[precommand]='bold,underline'
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#9a8060'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#9a8060'
+ZSH_HIGHLIGHT_STYLES[redirection]='bold'
+ZSH_HIGHLIGHT_STYLES[comment]='italic,fg=#707070'
+
+# Autosuggestions — neutral grey
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#707070'
+
+# History substring search — bold only, no vivid colors
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bold'
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg=#cc7832'
 
 # FZF integration (if available)
 if [ -f /usr/share/fzf/shell/key-bindings.zsh ]; then
@@ -734,10 +741,10 @@ if command -v eza &> /dev/null; then
     alias ll='eza -l --icons --group-directories-first'
     alias la='eza -la --icons --group-directories-first'
     alias lt='eza --tree --icons --group-directories-first --git-ignore --ignore-glob="venv|.venv|env|.env|node_modules|.git"'
-    alias lta='eza --tree --icons --group-directories-first'  # tree ALL (senza esclusioni)
-    alias lsga='eza --tree --icons --group-directories-first --git'  # tree ALL con git status
-    alias lsg3='eza --tree --level 3 --icons --group-directories-first --git'  # tree 3 livelli con git status
-    alias lsgm='git status -s'  # solo file modificati (git)
+    alias lta='eza --tree --icons --group-directories-first'
+    alias lsga='eza --tree --icons --group-directories-first --git'
+    alias lsg3='eza --tree --level 3 --icons --group-directories-first --git'
+    alias lsgm='git status -s'
 fi
 
 if command -v bat &> /dev/null; then
@@ -756,6 +763,54 @@ if command -v zoxide &> /dev/null; then
     alias cd='z'
 fi
 
+# Tmux aliases
+alias ta='tmux attach -t'
+alias tl='tmux ls'
+alias tn='tmux new -s'
+alias tk='tmux kill-session -t'
+alias tw='tmux new-window'
+alias tsp='tmux split-window -v'
+alias tsh='tmux split-window -h'
+
+# Tmux alias help
+th() {
+    echo ""
+    echo "  TMUX ALIASES"
+    echo "  ────────────────────────────────────"
+    echo "  ta <name>    attach to session"
+    echo "  tl           list sessions"
+    echo "  tn <name>    new session with name"
+    echo "  tk <name>    kill session"
+    echo "  tw           new window"
+    echo "  tsp          split vertical (↕)"
+    echo "  tsh          split horizontal (↔)"
+    echo "  ttheme <n>   apply theme to session"
+    echo ""
+    echo "  AVAILABLE THEMES"
+    echo "  ────────────────────────────────────"
+    echo "  cobalt  green  blue  purple  orange"
+    echo "  red     nord   everforest   gruvbox"
+    echo ""
+    echo "  AUTO THEMES (from session name)"
+    echo "  ────────────────────────────────────"
+    echo "  *dev* *code*     → green"
+    echo "  *research* *doc* → blue"
+    echo "  *debug* *test*   → orange"
+    echo "  *prod* *urgent*  → red"
+    echo ""
+}
+
+# Apply tmux theme to current session: ttheme green
+ttheme() {
+    local session
+    session=$(tmux display-message -p '#S' 2>/dev/null)
+    if [ -z "$session" ]; then
+        echo "No active tmux session"
+        return 1
+    fi
+    bash -c "source ~/.tmux/themes.sh && apply_theme '$1' '$session'"
+}
+
 # Starship prompt
 if command -v starship &> /dev/null; then
     eval "$(starship init zsh)"
@@ -765,10 +820,10 @@ fi
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# Bun completions (se installato)
+# Bun completions (if installed)
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
-# Alias per gestire i dotfiles (Bare Git Repository)
+# Alias for dotfiles management (Bare Git Repository)
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
 # Disable non-essential traffic and telemetry
@@ -896,6 +951,90 @@ EOF
 export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 export DISABLE_TELEMETRY=1
 export DISABLE_ERROR_REPORTING=1
+EOF
+        CHANGES_MADE=true
+    fi
+
+    # Check tmux aliases and ttheme function
+    if ! grep -q "alias ta=" "$ZSHRC"; then
+        echo "  + Adding tmux aliases and ttheme"
+        cat >> "$ZSHRC" << 'EOF'
+
+# Tmux aliases
+alias ta='tmux attach -t'
+alias tl='tmux ls'
+alias tn='tmux new -s'
+alias tk='tmux kill-session -t'
+alias tw='tmux new-window'
+alias tsp='tmux split-window -v'
+alias tsh='tmux split-window -h'
+
+# Tmux alias help
+th() {
+    echo ""
+    echo "  TMUX ALIASES"
+    echo "  ────────────────────────────────────"
+    echo "  ta <name>    attach to session"
+    echo "  tl           list sessions"
+    echo "  tn <name>    new session with name"
+    echo "  tk <name>    kill session"
+    echo "  tw           new window"
+    echo "  tsp          split vertical (↕)"
+    echo "  tsh          split horizontal (↔)"
+    echo "  ttheme <n>   apply theme to session"
+    echo ""
+    echo "  AVAILABLE THEMES"
+    echo "  ────────────────────────────────────"
+    echo "  cobalt  green  blue  purple  orange"
+    echo "  red     nord   everforest   gruvbox"
+    echo ""
+    echo "  AUTO THEMES (from session name)"
+    echo "  ────────────────────────────────────"
+    echo "  *dev* *code*     → green"
+    echo "  *research* *doc* → blue"
+    echo "  *debug* *test*   → orange"
+    echo "  *prod* *urgent*  → red"
+    echo ""
+}
+
+# Apply tmux theme to current session: ttheme green
+ttheme() {
+    local session
+    session=$(tmux display-message -p '#S' 2>/dev/null)
+    if [ -z "$session" ]; then
+        echo "No active tmux session"
+        return 1
+    fi
+    bash -c "source ~/.tmux/themes.sh && apply_theme '$1' '$session'"
+}
+EOF
+        CHANGES_MADE=true
+    fi
+
+    # Check neutral syntax highlighting
+    if ! grep -q "ZSH_HIGHLIGHT_STYLES\[command\]='bold'" "$ZSHRC"; then
+        echo "  + Updating zsh-syntax-highlighting to neutral styles"
+        cat >> "$ZSHRC" << 'EOF'
+
+# Syntax highlighting — neutral, works on any tmux theme background
+ZSH_HIGHLIGHT_STYLES[command]='bold'
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#cc7832,bold'
+ZSH_HIGHLIGHT_STYLES[builtin]='bold'
+ZSH_HIGHLIGHT_STYLES[alias]='bold,underline'
+ZSH_HIGHLIGHT_STYLES[path]='underline'
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=#9a8060'
+ZSH_HIGHLIGHT_STYLES[precommand]='bold,underline'
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=#9a8060'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=#9a8060'
+ZSH_HIGHLIGHT_STYLES[redirection]='bold'
+ZSH_HIGHLIGHT_STYLES[comment]='italic,fg=#707070'
+
+# Autosuggestions — neutral grey
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#707070'
+
+# History substring search — bold only, no vivid colors
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bold'
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg=#cc7832'
 EOF
         CHANGES_MADE=true
     fi
@@ -1054,6 +1193,27 @@ verify_installation() {
         echo "⚠️  Claude Code statusline not configured"
     fi
 
+    # Check tmux
+    if command -v tmux &>/dev/null; then
+        echo "✓ tmux: $(tmux -V)"
+    else
+        echo "⚠️  tmux not installed (optional)"
+    fi
+
+    # Check TPM
+    if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+        echo "✓ TPM: installed"
+    else
+        echo "⚠️  TPM not installed (required for tmux plugins)"
+    fi
+
+    # Check tmux themes
+    if [ -f "$HOME/.tmux/themes.sh" ]; then
+        echo "✓ Tmux themes: installed"
+    else
+        echo "⚠️  Tmux themes not installed"
+    fi
+
     # Check .zshrc
     if [ -f "$HOME/.zshrc" ]; then
         if grep -q "starship init zsh" "$HOME/.zshrc"; then
@@ -1120,6 +1280,89 @@ show_update_summary() {
     fi
 }
 
+# Install tmux + TPM + plugins + themes
+install_tmux() {
+    echo -e "\n🖥️  Installing tmux + themes + plugins..."
+
+    # Install tmux
+    if ! command -v tmux &>/dev/null; then
+        echo "Installing tmux..."
+        if [ "$OS" = "fedora" ] || [ "$OS" = "rhel" ] || [ "$OS" = "centos" ]; then
+            sudo dnf install -y tmux
+        elif [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
+            sudo apt install -y tmux
+        fi
+        echo "✓ tmux installed ($(tmux -V))"
+    else
+        echo "✓ tmux already installed ($(tmux -V))"
+    fi
+
+    # Create ~/.tmux directory
+    mkdir -p "$HOME/.tmux"
+
+    # Install TPM
+    if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+        echo "Installing TPM (Tmux Plugin Manager)..."
+        git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+        echo "✓ TPM installed"
+    else
+        if [ "$UPDATE_MODE" = true ]; then
+            echo "Updating TPM..."
+            git -C "$HOME/.tmux/plugins/tpm" pull --quiet
+            echo "✓ TPM updated"
+        else
+            echo "✓ TPM already installed"
+        fi
+    fi
+
+    # Copy .tmux.conf
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "$SCRIPT_DIR/data/tmux.conf" ]; then
+        if [ -f "$HOME/.tmux.conf" ]; then
+            if ! diff -q "$SCRIPT_DIR/data/tmux.conf" "$HOME/.tmux.conf" &>/dev/null; then
+                echo "⚠️  .tmux.conf differs from repository version"
+                if [ "$UPDATE_MODE" = true ]; then
+                    BACKUP="$HOME/.tmux.conf.backup.$(date +%Y%m%d_%H%M%S)"
+                    cp "$HOME/.tmux.conf" "$BACKUP"
+                    cp "$SCRIPT_DIR/data/tmux.conf" "$HOME/.tmux.conf"
+                    echo "✓ .tmux.conf updated (backup: $BACKUP)"
+                else
+                    read -p "Apply tmux config? Current config will be backed up. (y/N) " -n 1 -r
+                    echo
+                    if [[ $REPLY =~ ^[YySs]$ ]]; then
+                        BACKUP="$HOME/.tmux.conf.backup.$(date +%Y%m%d_%H%M%S)"
+                        cp "$HOME/.tmux.conf" "$BACKUP"
+                        cp "$SCRIPT_DIR/data/tmux.conf" "$HOME/.tmux.conf"
+                        echo "✓ .tmux.conf updated (backup: $BACKUP)"
+                    else
+                        echo "⊘ .tmux.conf update skipped"
+                    fi
+                fi
+            else
+                echo "✓ .tmux.conf already up to date"
+            fi
+        else
+            cp "$SCRIPT_DIR/data/tmux.conf" "$HOME/.tmux.conf"
+            echo "✓ .tmux.conf created"
+        fi
+    fi
+
+    # Copy themes
+    cp "$SCRIPT_DIR/data/themes.sh" "$HOME/.tmux/themes.sh"
+    chmod +x "$HOME/.tmux/themes.sh"
+    cp "$SCRIPT_DIR/data/apply-theme-hook.sh" "$HOME/.tmux/apply-theme-hook.sh"
+    chmod +x "$HOME/.tmux/apply-theme-hook.sh"
+    echo "✓ Tmux themes installed (cobalt, green, blue, purple, orange, red, nord, everforest, gruvbox)"
+
+    # Install TPM plugins headless
+    if [ -f "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
+        echo "Installing TPM plugins..."
+        TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins" \
+            "$HOME/.tmux/plugins/tpm/bin/install_plugins" 2>/dev/null
+        echo "✓ Plugins installed (tmux-sensible, tmux-yank, tmux-resurrect, tmux-continuum)"
+    fi
+}
+
 # Main
 main() {
     install_base_packages
@@ -1130,6 +1373,7 @@ main() {
     handle_wsl_fonts
     install_eza
     install_jq
+    install_tmux
     apply_starship_config          # IMPORTANTE: prima di Claude Code statusline
     install_claude_code_statusline  # Usa la config Starship
     install_modern_tools
