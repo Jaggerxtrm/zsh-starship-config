@@ -38,6 +38,9 @@ Commands:
   status                    Show installed versions and health check
   help                      Show this help
 
+Options:
+  --yes, -y                 Non-interactive: auto-confirm all prompts (CI/Docker)
+
 Components (for update):
   eza  tmux  starship  fonts  zshrc  omz  plugins  statusline  tools
 
@@ -46,6 +49,7 @@ Themes (for theme):
 
 Examples:
   zsc install
+  zsc install --yes         # no prompts — for scripts/Dockerfiles
   zsc update
   zsc update eza
   zsc theme nord
@@ -148,9 +152,9 @@ function resolveTmuxSession(explicitSession) {
 // Subcommand handlers
 // ---------------------------------------------------------------------------
 
-/** zsc install → install.sh (no extra args) */
-function cmdInstall() {
-  runInstallScript([]);
+/** zsc install [--yes] → install.sh [--yes] */
+function cmdInstall(yes) {
+  runInstallScript(yes ? ['--yes'] : []);
 }
 
 /**
@@ -158,7 +162,7 @@ function cmdInstall() {
  *   → install.sh --update
  *   → install.sh --update --only <component>
  */
-function cmdUpdate(component) {
+function cmdUpdate(component, yes) {
   if (component !== undefined && !COMPONENTS.includes(component)) {
     console.error(`Error: unknown component "${component}".`);
     console.error(`Valid components: ${COMPONENTS.join(', ')}`);
@@ -166,6 +170,7 @@ function cmdUpdate(component) {
   }
 
   const args = ['--update'];
+  if (yes) args.push('--yes');
   if (component) {
     args.push('--only', component);
   }
@@ -240,14 +245,18 @@ function cmdHelp() {
 
 const [, , subcommand, ...rest] = process.argv;
 
+// Extract --yes / -y flag from remaining args
+const yesFlag = rest.includes('--yes') || rest.includes('-y');
+const filteredRest = rest.filter(a => a !== '--yes' && a !== '-y');
+
 switch (subcommand) {
   case 'install':
-    cmdInstall();
+    cmdInstall(yesFlag);
     break;
 
   case 'update':
-    // rest[0] is the optional component name
-    cmdUpdate(rest[0]);
+    // filteredRest[0] is the optional component name
+    cmdUpdate(filteredRest[0], yesFlag);
     break;
 
   case 'theme':
