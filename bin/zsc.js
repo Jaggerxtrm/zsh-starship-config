@@ -15,6 +15,7 @@ const { theme } = require('../src/commands/theme');
 const { config } = require('../src/commands/config');
 const { rollback } = require('../src/commands/rollback');
 const { backup } = require('../src/commands/backup');
+const { reload } = require('../src/commands/reload');
 
 // Constants
 const PACKAGE_JSON = require('../package.json');
@@ -148,6 +149,16 @@ program
     await backup(options, SCRIPT_DIR);
   });
 
+// zsc reload
+program
+  .command('reload')
+  .description('Reload tmux configuration')
+  .option('--verbose', 'Show detailed output')
+  .action(async (options) => {
+    showBanner();
+    await reload(options, SCRIPT_DIR);
+  });
+
 // zsc restore [options]
 program
   .command('restore')
@@ -156,7 +167,7 @@ program
   .option('--dry-run', 'Preview restoration without applying')
   .action(async (options) => {
     showBanner();
-    console.log(chalk.yellow('Restore functionality will be implemented in future release'));
+    await reload(options, SCRIPT_DIR);
   });
 
 // zsc rollback [options]

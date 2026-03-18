@@ -8,5 +8,6 @@ module.exports = {
   theme: require('./theme').theme,
   config: require('./config').config,
   rollback: require('./rollback').rollback,
-  backup: require('./backup').backup
+  backup: require('./backup').backup,
+  reload: require('./reload').reload
 };

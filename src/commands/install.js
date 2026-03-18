@@ -177,6 +177,11 @@ async function install(components = [], options = {}, scriptDir) {
       logger.info('1. Restart your terminal or run: source ~/.zshrc');
       logger.info('2. Configure terminal font to: MesloLGS NF or JetBrainsMono Nerd Font');
       logger.info('3. Run: zsc status to verify installation');
+      
+      // Reload tmux configuration to apply changes
+      logger.info('\nApplying tmux configuration...');
+      const { reload } = require('./reload');
+      await reload({ verbose: options.verbose || false }, scriptDir);
     } else {
       logger.warning('Installation completed with errors');
       logger.info('Run: zsc status to check component status');
