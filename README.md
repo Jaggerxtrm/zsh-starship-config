@@ -1,521 +1,725 @@
-# Zsh and Starship Configuration
+# Zsh Starship Config - npm Installer
 
-A complete and portable setup for a modern Zsh + Starship + tmux configuration. Neutral style, no Nerd Font required, adaptive to any tmux color theme.
+**Modern Zsh + Starship + Nerd Fonts setup via npm**
+
+A robust and feature-rich CLI installer that provides a complete Zsh, Starship, tmux, and development environment setup with advanced features like rollback, configuration management, and dry-run modes.
 
 ## Features
 
-### Prompt (Starship)
-- **Theme**: Neutral/professional — no hardcoded colors, inherits terminal fg automatically
-- **Adaptive**: Works with all tmux themes (cobalt, green, blue, purple, orange, red, nord, everforest, gruvbox)
-- **No Nerd Font required**: uses plain Unicode symbols (`*` `+` `-` `↑` `↓` `↕`)
-- **Git**: branch, status (modified/staged/deleted/ahead/behind), state (rebase/merge/cherry-pick)
-- **Python venv**: shown on right prompt when active
-- **Format**: `hostname dir branch (status) $`
-
-### Tmux
-- **9 color themes**: cobalt (default), green, blue, purple, orange, red, nord, everforest, gruvbox
-- **Auto-theme**: session name determines theme automatically (`*dev*` → green, `*prod*` → red, etc.)
-- **`ttheme <name>`**: apply theme to current session instantly, all windows updated
-- **Plugins via TPM**: tmux-sensible, tmux-yank, tmux-resurrect, tmux-continuum
-- **Dual status bar**: current path + time on top, keybind cheatsheet on bottom
-
-### Zsh (Oh My Zsh)
-- **Active Plugins**:
-  - `git`: Aliases and functions for Git
-  - `zsh-autosuggestions`: Suggestions while typing
-  - `zsh-syntax-highlighting`: Neutral highlighting (bold/underline, no vivid colors)
-  - `zsh-history-substring-search`: Search within history
-  - `colored-man-pages`: Colored manual pages
-  - `command-not-found`: Suggestions for missing commands
-
-### Modern Tools (Optional)
-- **eza**: Modern `ls` with icons (automatically installed)
-- **bat**: `cat` clone with syntax highlighting
-- **ripgrep**: Extremely fast `grep` alternative
-- **fd**: User-friendly `find` alternative
-- **zoxide**: Smarter `cd` with memory
-- **fzf**: Interactive fuzzy finder
-
-**Smart Aliases:**
-- `lt`: Tree view excluding venv, node_modules, and .git
-- `lta`: Complete tree view without exclusions
-- `lsga`: Tree view with git status **[NEW in v2.1.0]**
-- `lsg3`: 3-level tree with git status **[NEW in v2.1.0]**
-- `lsgm`: Git status short format (`git status -s`) **[NEW in v2.1.0]**
-
-## Requirements
-
-- Operating System: Fedora, RHEL, Ubuntu, Debian
-- Git installed
-- Sudo access (for package installation)
-- Terminal with 256-color support
-
-## WSL2 Support (Windows)
-
-If using WSL (Windows Subsystem for Linux), the script will automatically detect the environment.
-
-### Automatic Font Installation
-
-The script automatically installs fonts on Windows via PowerShell:
-
-1. Copies fonts to `C:\Users\YourName\Downloads\NerdFonts_Zsh_Setup`
-2. Executes PowerShell to install them (no manual installation required)
-3. Registers fonts in the Windows Registry
-4. Configuration required for Windows Terminal:
-   - Settings -> Profiles -> Ubuntu (or your distro) -> Appearance
-   - Font face: **MesloLGS NF**
-   - Restart Windows Terminal
-
-### Manual Fallback (if PowerShell fails)
-
-If the automatic installation fails:
-1. The script will copy the fonts to the **Downloads** folder (`NerdFonts_Zsh_Setup`)
-2. Open that folder in Windows
-3. Select all `.ttf` files
-4. Right-click -> **Install**
+- ✨ **Comprehensive Installation**: Zsh, Oh My Zsh, Starship, tmux, Nerd Fonts, eza, and modern tools
+- 🎨 **9 Tmux Themes**: cobalt, green, blue, purple, orange, red, nord, everforest, gruvbox, cream
+- 🔄 **Rollback System**: Undo changes if something goes wrong
+- 💾 **Backup Management**: Automatic backups before modifications
+- 🔧 **Configuration Management**: Persistent configuration with CLI and interactive modes
+- 🎯 **Dry-run Mode**: Preview changes without applying them
+- 📊 **Status Monitoring**: Real-time system health and component status
+- 🎨 **Clipboard Support**: Native OSC 52 clipboard for Linux/Wayland with mouse support
 
 ## Installation
 
-### via npm (Recommended)
-
-Install directly from GitHub — no clone required:
+### Quick Install
 
 ```bash
-npm install -g github:Jaggerxtrm/zsh-starship-config
+# Install globally via npm
+npm install -g @jaggerxtrm/zsh-starship-config
+
+# Run installer
 zsc install
 ```
 
-Reload the shell when done:
+### Install Specific Components
 
 ```bash
-exec zsh
+# Install only Zsh and Starship
+zsc install --only zsh --only starship
+
+# Install tmux themes only
+zsc install --only tmuxThemes
+
+# Install with custom options
+zsc install --font-type nerd --shell zsh
 ```
 
-### `zsc` CLI reference
+## Usage
 
-After installing globally, the `zsc` command is available from anywhere:
+### Basic Commands
 
 ```bash
-zsc install                  # Full setup (first-time)
-zsc update                   # Update all components
-zsc update eza               # Update a single component
-zsc theme nord               # Apply a tmux colour theme
-zsc theme cobalt myproject   # Apply theme to a named session
-zsc status                   # Show installed versions + health check
-zsc help                     # Usage reference
+# Show help
+zsc help
+
+# Show version
+zsc --version
+
+# Check installation status
+zsc status
+
+# Apply tmux theme
+zsc theme nord
+
+# Auto-detect session and apply theme
+zsc theme --auto
+
+# List available themes
+zsc theme --list
+
+# Manage configuration
+zsc config --list
 ```
 
-**Components** (`zsc update <component>`):
-`eza` `tmux` `starship` `fonts` `zshrc` `omz` `plugins` `statusline` `tools`
+### Advanced Usage
 
-**Themes** (`zsc theme <name>`):
-`cobalt` `green` `blue` `purple` `orange` `red` `nord` `everforest` `gruvbox`
-
-### Update
+#### Dry-run Mode (Preview Changes)
 
 ```bash
-zsc update           # update everything
-zsc update starship  # update only starship
-zsc update eza       # update only eza
+# Preview installation without applying changes
+zsc install --dry-run
+
+# Preview theme application
+zsc theme cobalt --preview
+
+# Preview update
+zsc update --dry-run
 ```
 
-> **Note:** `npm update -g` does not work for GitHub-installed packages. Use `zsc update` instead, or re-run `npm install -g github:Jaggerxtrm/zsh-starship-config`.
-
-### Manual (Git Clone)
+#### Component Filtering
 
 ```bash
-git clone https://github.com/Jaggerxtrm/zsh-starship-config.git ~/projects/zsh-starship-config
-cd ~/projects/zsh-starship-config
-./install.sh
+# Install everything except fonts
+zsc install --exclude fonts
+
+# Update only specific components
+zsc update --only starship --only tmux
+
+# Update multiple specific components
+zsc update tmux themes eza
 ```
 
-Update mode (overwrites configs automatically without prompts):
+#### Configuration Management
 
 ```bash
-cd ~/projects/zsh-starship-config && git pull && ./install.sh --update
+# Interactive configuration
+zsc config
+
+# Get configuration value
+zsc config --get components.zsh.enabled
+
+# Set configuration value
+zsc config --set preferences.autoUpdate false
+
+# List all configuration
+zsc config --list
+
+# Reset to defaults
+zsc config --reset
+
+# Export configuration
+zsc config --export my-config.json
 ```
 
-### Available `install.sh` flags
+#### Backup and Rollback
 
 ```bash
-./install.sh                      # Full installation
-./install.sh --update             # Update mode (no prompts, auto-backup)
-./install.sh --update --only eza  # Update a single component
-./install.sh --status             # Health check only
-./install.sh --verbose            # Detailed output
-./install.sh --help               # Show all options
+# Create backup
+zsc backup
+
+# List rollback points
+zsc rollback --list
+
+# Rollback last change
+zsc rollback
+
+# Rollback multiple steps
+zsc rollback --step 2
+
+# Dry-run rollback
+zsc rollback --dry-run
 ```
 
-**Check installed version:**
-```bash
-cat ~/.zsh-starship-config-version
+## Component Reference
+
+### Available Components
+
+| Component | Description | Dependencies |
+|-----------|-------------|--------------|
+| `zsh` | Zsh shell and configuration | - |
+| `ohMyZsh` | Oh My Zsh framework | zsh |
+| `plugins` | Zsh plugins (autosuggestions, syntax-highlighting, etc.) | zsh, ohMyZsh |
+| `starship` | Starship prompt | - |
+| `fonts` | Nerd Fonts installation | - |
+| `tmux` | Tmux terminal multiplexer | - |
+| `tmuxPlugins` | Tmux plugins via TPM | tmux |
+| `tmuxThemes` | Tmux color themes | tmux |
+| `eza` | Modern ls replacement | - |
+| `tools` | Modern tools (bat, ripgrep, fd, zoxide, fzf) | - |
+| `statusline` | Claude Code status line configuration | starship |
+| `zshrc` | Zsh configuration file | zsh, ohMyZsh, starship |
+| `hooks` | Git hooks and automation | zsh |
+
+### Aliases
+
+You can use aliases instead of component names:
+
+- `all` - All components
+- `full` - All components (same as all)
+- `minimal` - zsh, starship, fonts, zshrc
+- `dev` - All components (same as all)
+- `basic` - zsh, ohMyZsh, plugins, starship, fonts, zshrc
+
+## Tmux Themes
+
+### Available Themes
+
+| Theme | Description | Auto-trigger |
+|--------|-------------|--------------|
+| `cobalt` | Blue/gray professional theme | - |
+| `green` | Green development theme | *dev*, *code* |
+| `blue` | Blue research theme | *research*, *doc* |
+| `purple` | Purple calm theme | - |
+| `orange` | Orange warning theme | *debug*, *test* |
+| `red` | Red urgent theme | *prod*, *urgent* |
+| `nord` | Nord dark theme | - |
+| `everforest` | Everforest green theme | - |
+| `gruvbox` | Gruvbox retro theme | - |
+| `cream` | Cream light theme | - |
+
+### Auto-Theming
+
+When you create tmux sessions, the theme is automatically applied based on the session name:
+
+- `dev*`, `code*` → green theme
+- `research*`, `doc*` → blue theme
+- `debug*`, `test*` → orange theme
+- `prod*`, `urgent*` → red theme
+
+### Tmux Configuration
+
+The installer automatically configures tmux with:
+
+- **Native clipboard** (OSC 52): Works over SSH, no external tools needed
+- **Enhanced tmux-yank**: Improved copy/paste with mouse support
+- **9 themes**: Pre-configured color themes
+- **Dual status bar**: Current path and keybind cheatsheet
+- **TPM plugins**: tmux-sensible, tmux-resurrect, tmux-continuum
+- **Auto reload**: Configuration automatically reloaded after changes
+
+## Configuration
+
+### Configuration File
+
+Configuration is stored in `~/.zsc/config.json`:
+
+```json
+{
+  "version": "1.0.0",
+  "components": {
+    "zsh": {
+      "enabled": true,
+      "shell": "zsh",
+      "configPath": "~/.zshrc",
+      "plugins": ["zsh-autosuggestions", "zsh-syntax-highlighting", "zsh-history-substring-search"]
+    },
+    "starship": {
+      "enabled": true,
+      "configPath": "~/.config/starship.toml",
+      "binaryPath": "~/.local/bin/starship"
+    },
+    "tmux": {
+      "enabled": true,
+      "configPath": "~/.tmux.conf",
+      "themePath": "~/.tmux/themes.sh",
+      "plugins": ["tmux-sensible", "tmux-resurrect", "tmux-continuum"],
+      "tpmPath": "~/.tmux/plugins/tpm"
+    }
+  },
+  "preferences": {
+    "autoUpdate": true,
+    "checkForUpdates": true,
+    "createBackups": true,
+    "backupPrefix": "backup",
+    "keepBackups": 5,
+    "parallelInstall": false
+  },
+  "paths": {
+    "cacheDir": "~/.zsc/cache",
+    "logsDir": "~/.zsc/logs",
+    "backupDir": "~/.zsc/backups"
+  }
+}
 ```
 
-## What Gets Installed
+### Configuration Options
 
-The script automatically installs and configures:
+| Option | Default | Description |
+|--------|----------|-------------|
+| `autoUpdate` | true | Automatically check for updates |
+| `createBackups` | true | Create backups before modifications |
+| `keepBackups` | 5 | Number of backups to keep |
+| `backupPrefix` | 'backup' | Prefix for backup files |
+| `parallelInstall` | false | Run installations in parallel |
 
-1. **Zsh** + Oh My Zsh
-2. **Zsh Plugins** (autosuggestions, syntax-highlighting, history-substring-search)
-3. **Starship** prompt (neutral/adaptive theme)
-4. **Nerd Fonts** (Meslo, JetBrains, Hack, FiraMono, Cousine)
-5. **tmux** + TPM + plugins (tmux-sensible, tmux-yank, tmux-resurrect, tmux-continuum)
-6. **tmux themes** (9 themes, auto-applied by session name)
-7. **eza** (modern `ls` with icons)
-8. **jq** (JSON parser, required for Claude Code status line)
-9. **Claude Code status line** (model name, token usage %, git status, venv)
-10. **Modern tools** (bat, ripgrep, fd, zoxide — optional)
+## Advanced Features
 
-### Manual Installation
+### Dry-run Mode
 
-If you prefer to install manually:
-
-#### 1. Install Zsh
-```bash
-# Fedora
-sudo dnf install zsh
-
-# Ubuntu/Debian
-sudo apt install zsh
-```
-
-#### 2. Install Oh My Zsh
-```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
-
-#### 3. Install Zsh Plugins
-```bash
-# zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-
-# zsh-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-
-# zsh-history-substring-search
-git clone https://github.com/zsh-users/zsh-history-substring-search ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-history-substring-search
-```
-
-#### 4. Install Starship
-```bash
-curl -sS https://starship.rs/install.sh | sh
-```
-
-#### 5. Install Nerd Fonts
-
-**MesloLGS NF** (Recommended):
-```bash
-mkdir -p ~/.local/share/fonts
-cd ~/.local/share/fonts
-wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
-wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
-wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
-wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
-fc-cache -fv
-```
-
-**JetBrainsMono Nerd Font** (Alternative):
-```bash
-cd /tmp
-wget https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
-mkdir -p ~/.local/share/fonts/JetBrainsMonoNerdFont
-tar -xf JetBrainsMono.tar.xz -C ~/.local/share/fonts/JetBrainsMonoNerdFont
-fc-cache -fv
-```
-
-**Other Included Nerd Fonts (Hack, FiraMono, Cousine):**
-You can install them similarly by downloading `Hack.tar.xz`, `FiraMono.tar.xz`, or `Cousine.tar.xz` from [nerd-fonts releases](https://github.com/ryanoasis/nerd-fonts/releases).
-
-#### 6. Apply Configuration
-```bash
-# Copy starship config
-cp starship.toml ~/.config/starship.toml
-
-# Modify .zshrc to enable Starship
-echo 'eval "$(starship init zsh)"' >> ~/.zshrc
-```
-
-#### 7. Configure Terminal
-In the terminal settings, select the font:
-- **MesloLGS NF** (Recommended)
-- Or **JetBrainsMono Nerd Font**
-- Size: 11 or 12
-
-#### 8. Restart Terminal
-```bash
-source ~/.zshrc
-# Or close and reopen the terminal
-```
-
-## Claude Code Status Line Integration
-
-Claude Code can use the **same Starship theme** for its status line, with **advanced features**.
-
-### Automatic Configuration
-
-The `install.sh` script automatically configures the Claude Code status line. The configuration is installed in:
-- **Script**: `~/.claude/hooks/statusline-starship.sh`
-- **Config**: `~/.claude/settings.json`
-
-### Displayed Information (Enhanced Version)
-
-The Claude Code status line shows **all this information in real-time**:
-
-| Element | Description | Example |
-|---|---|---|
-| **Model** | Currently used Claude model | `Claude 3.5 Sonnet` |
-| **Usage** | Context usage percentage | `[15%]` |
-| **User@Host** | Username and hostname | `dawid@fedora` |
-| **Directory** | Current path (truncated to repo root) | `second-mind` |
-| **Git Branch** | Git branch with icon | ` master` |
-| **Git Status** | Uncommitted changes | ` ` (if dirty) |
-| **Python Venv** | Active virtual environment | ` (venv)` |
-
-**Full Output Example:**
-```
-Claude 3.5 Sonnet [15%] dawid@fedora second-mind  master
-```
-
-### Advanced Features
-
-#### 1. Real-Time Token Usage
-- Shows context usage percentage `[X%]`
-- Updates dynamically during the conversation
-- **Automatically decreases after context compaction**
-
-#### 2. Model Display
-- Shows the currently used Claude model (cyan)
-- Useful when switching between models (Sonnet, Opus, Haiku)
-
-#### 3. Git Intelligence
-- Directory truncated to repository root (like Starship)
-- Automatically detects changes with `core.useBuiltinFSMonitor=false` to avoid locks
-- Properly rendered Nerd Font icons
-
-#### 4. Starship-Matched Colors
-- **Model/Usage**: Cyan (`\033[36m`) - distinctive
-- **Username**: White (`\033[37m`)
-- **Hostname**: Bold Green (`\033[1;32m`)
-- **Directory**: White (`\033[37m`)
-- **Git**: Green (`\033[32m`)
-- **Python Venv**: Yellow (`\033[33m`)
-
-### Manual Configuration (If Necessary)
-
-If you wish to install manually or customize:
+Preview changes without applying them:
 
 ```bash
-# Copy the script from the repository
-cp data/claude-statusline-starship.sh ~/.claude/hooks/statusline-starship.sh
-chmod +x ~/.claude/hooks/statusline-starship.sh
+# Preview installation
+zsc install --dry-run
 
-# Configure Claude Code (preserves other settings)
-jq '. + {"statusLine": {"command": "~/.claude/hooks/statusline-starship.sh"}}' \
-    ~/.claude/settings.json > ~/.claude/settings.json.tmp && \
-    mv ~/.claude/settings.json.tmp ~/.claude/settings.json
+# Preview theme application
+zsc theme nord --preview
+
+# Preview update
+zsc update --dry-run
 ```
 
-### Requirements
-- `jq` for JSON parsing (automatically installed)
-- Nerd Font installed (already configured for Starship)
-- Git (for repository features)
+Dry-run mode shows:
+- What would be installed/updated
+- Files that would be created/modified
+- Commands that would be executed
+- Configuration changes that would be made
 
-### Source File
+### Rollback System
 
-The complete script is available in `data/claude-statusline-starship.sh` in the repository.
-
-## Customization
-
-### Prompt Colors
-
-Colors are defined in `starship.toml`:
-
-```toml
-# Username and Directory
-style = "white"  # White text
-
-# Git branch
-style = "#bb9af7"  # Tokyo Night Purple
-
-# Git status (errors/modifications)
-style = "#f7768e"  # Tokyo Night Red
-
-# Python/Languages
-style = "#e0af68"  # Tokyo Night Yellow
-
-# Prompt character (Green/Red)
-success_symbol = "[>](bold green)"
-error_symbol = "[>](bold red)"
-```
-
-### Syntax Highlighting (Ocean Blue)
-
-Syntax highlighting colors while typing are configured with the Ocean Blue palette:
+Undo changes if something goes wrong:
 
 ```bash
-ZSH_HIGHLIGHT_STYLES[command]='fg=#61afef'        # Commands: Light Blue
-ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#e06c75'  # Errors: Soft Red
-ZSH_HIGHLIGHT_STYLES[builtin]='fg=#56b6c2'        # Built-in: Cyan
-ZSH_HIGHLIGHT_STYLES[alias]='fg=#528bff'          # Alias: Electric Blue
-ZSH_HIGHLIGHT_STYLES[path]='fg=#89b4fa'           # Path: Light Blue
+# List available rollback points
+zsc rollback --list
+
+# Rollback last change
+zsc rollback
+
+# Rollback multiple changes
+zsc rollback --step 3
+
+# Dry-run rollback
+zsc rollback --dry-run
 ```
 
-### Nerd Font Icons
+Rollback features:
+- Multi-step rollback support
+- Automatic backup creation before changes
+- Rollback point tracking
+- Safe restoration with verification
 
-The icons used are Unicode Nerd Font codes:
+### Backup Management
 
-| Element | Code |
-|---|---|
-| Linux (Fedora) | `\uf303` |
-| Git Branch | `\ue0a0` |
-| GitHub | `\uf1d3` |
-| Python | `\ue73c` |
-| Modified | `\uf040` |
-| Staged | `\uf00c` |
-| Untracked | `\uf128` |
+Create and manage backups:
 
-To modify icons, edit `starship.toml` and change the `\uf...` or `\ue...` codes.
+```bash
+# Create manual backup
+zsc backup
 
-### Adding Other Languages
+# Backup with options
+zsc backup --output ~/backups --compress
 
-Example for adding Ruby:
+# Include data files in backup
+zsc backup --include-data
 
-```toml
-[ruby]
-symbol = " "
-format = "[$symbol]($style)[($version )]($style)"
-style = "#e06c75"
+# View backup statistics
+zsc status
 ```
 
-Then add `$ruby` to the `format` string at the top of the file.
+## Examples
 
-## Advanced Configuration
+### Complete Installation
 
-### Disable Username
+```bash
+# Full installation with all defaults
+zsc install
 
-```toml
-[username]
-disabled = true  # Change to true
+# Non-interactive mode (for scripts/Docker)
+zsc install --yes
+
+# Verbose installation
+zsc install --verbose
 ```
 
-### Always Show Python Version
+### Selective Installation
 
-```toml
-[python]
-format = "[$symbol($version )]($style)[($virtualenv )]($style)"
+```bash
+# Minimal installation
+zsc install minimal
+
+# Install development tools only
+zsc install tools
+
+# Install tmux setup only
+zsc install tmux tmuxPlugins tmuxThemes
+
+# Exclude specific components
+zsc install --exclude fonts
 ```
 
-### Change Linux Icon
+### Update Workflow
 
-The configuration uses a generic Tux (\uf17c). You can change it:
+```bash
+# Update all installed components
+zsc update
 
-```toml
-# Generic Tux (default)
-format = "\uf17c [$user]($style) "
+# Update specific components
+zsc update starship tmux
 
-# Fedora Logo
-format = "\uf303 [$user]($style) "
+# Update with backup creation
+zsc update --yes
 
-# Ubuntu Logo
-format = "\uf31b [$user]($style) "
+# Update in dry-run mode
+zsc update --dry-run
 ```
 
-### Add Time
+### Theme Management
 
-```toml
-[time]
-disabled = false
-format = "[$time]($style) "
-style = "#7dcfff"
+```bash
+# Apply specific theme to current session
+zsc theme nord
+
+# Apply theme to specific session
+zsc theme cobalt myproject
+
+# Auto-detect session
+zsc theme --auto
+
+# List all themes
+zsc theme --list
+
+# Preview theme without applying
+zsc theme everforest --preview
 ```
 
-And add `$time` to the main format.
+### Configuration Management
 
-## Git Icons Documentation
+```bash
+# Interactive configuration
+zsc config
 
-| Unicode | Meaning |
-|---|---|
-| \uf040 | Modified files (not staged) |
-| \uf00c | Staged files ready for commit |
-| \uf128 | Untracked files |
-| \uf05e | Deleted files |
-| \uf02b | Renamed files |
-| \uf0aa | Commits ahead (need push) |
-| \uf0ab | Commits behind (need pull) |
-| \uf0ec | Divergent branches or conflicts |
-| \uf448 | Stashed changes |
+# Get specific configuration
+zsc config --get preferences.autoUpdate
+
+# Set specific configuration
+zsc config --set preferences.parallelInstall true
+
+# Delete configuration value
+zsc config --delete components.tmux.enabled
+
+# Export configuration
+zsc config --export ~/zsc-config-backup.json
+
+# Reset to defaults
+zsc config --reset
+```
+
+### Status Monitoring
+
+```bash
+# Show all status
+zsc status
+
+# Show specific component status
+zsc status --only tmux
+
+# Export status as JSON
+zsc status --json
+
+# Export status to file
+zsc status --export ~/zsc-status.json
+```
+
+### Error Recovery
+
+```bash
+# Check what failed
+zsc status
+
+# Rollback last changes
+zsc rollback
+
+# Retry installation with different options
+zsc install --yes --verbose
+```
 
 ## Troubleshooting
 
-### Icons appear as empty squares
+### Installation Issues
 
-**Issue**: The terminal is not using a Nerd Font.
-
-**Solution**:
-1. Verify the font is installed: `fc-list | grep "MesloLGS\|JetBrainsMono Nerd"`
-2. In terminal preferences, select "MesloLGS NF" or "JetBrainsMono Nerd Font"
-3. COMPLETELY close the terminal and reopen it
-4. Test with: `echo "\uf1d3 \ue0a0 \ue73c"`
-
-### Starship does not start
-
-**Issue**: `command not found: starship`
-
-**Solution**:
+**Issue**: Permission denied errors
 ```bash
-# Verify installation
-which starship
+# Solution: Run with appropriate permissions or use sudo
+sudo zsc install
 
-# If not found, reinstall
-curl -sS https://starship.rs/install.sh | sh
-
-# Verify PATH
-echo $PATH | grep ".local/bin"
-
-# Add to .zshrc if missing
-export PATH="$HOME/.local/bin:$PATH"
+# Or check file permissions
+ls -la ~/.zshrc ~/.config/
 ```
 
-### Zsh Plugins not working
-
-**Issue**: Autosuggestions or syntax highlighting not active.
-
-**Solution**:
+**Issue**: Dependencies not found
 ```bash
-# Verify plugin installation
-ls ~/.oh-my-zsh/custom/plugins/
+# Solution: Check what's missing
+zsc status
 
-# Verify .zshrc
-grep "plugins=" ~/.zshrc
-
-# Must contain:
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting ...)
+# Install missing dependencies
+zsc install --only <missing-component>
 ```
 
-### Python/languages not detected
+**Issue**: Theme not applying
+```bash
+# Solution: Check tmux is running
+echo $TMUX
 
-**Issue**: Python icon does not appear.
+# Check theme script exists
+ls -la ~/.tmux/themes.sh
 
-**Solution**:
-- Ensure you are in a directory with `.py`, `requirements.txt`, or `pyproject.toml` files
-- Or activate a virtual environment
-- Verify with: `starship module python`
+# Verify tmux configuration
+tmux show-options -g | grep theme
+```
 
-## Resources
+### Clipboard Issues
 
-- [Starship Documentation](https://starship.rs/config/)
-- [Nerd Fonts](https://www.nerdfonts.com/)
-- [Oh My Zsh](https://ohmyz.sh/)
-- [Nerd Fonts Cheat Sheet](https://www.nerdfonts.com/cheat-sheet) - Search for icons
+**Issue**: Clipboard not working over SSH
+```bash
+# Solution: OSC 52 clipboard works over SSH, verify:
+# 1. Terminal setting: "set -s set-clipboard on"
+# 2. Tmux config: "set -g set-clipboard on"
+# 3. Check tmux-yank is installed: ls ~/.tmux/plugins/tpm/
+```
+
+**Issue**: tmux-yank not installing via TPM
+```bash
+# Manual install of tmux-yank
+cd ~/.tmux/plugins/tpm
+git clone https://github.com/tmux-plugins/tmux-yank
+
+# Reload tmux config
+tmux source-file ~/.tmux.conf
+```
+
+### Rollback Issues
+
+**Issue**: Rollback not working
+```bash
+# Check available rollback points
+zsc rollback --list
+
+# Verify rollback files exist
+ls -la ~/.zsc/backups/
+
+# Force rollback to specific point
+zsc rollback --step 1 --force
+```
+
+## Migration from Shell Script
+
+If you're currently using the shell script installer (`install.sh`), here's how to migrate:
+
+### Before Migration
+
+1. **Backup current configuration**:
+```bash
+zsc backup --output ~/migration-backup --compress
+```
+
+2. **Check current installation**:
+```bash
+zsc status
+```
+
+3. **Uninstall shell-based components** (if desired):
+```bash
+# Review what's installed
+zsc status --json > current-config.json
+```
+
+### Migration Process
+
+```bash
+# Fresh install with npm installer
+zsc install
+
+# This will:
+# - Detect existing components
+# - Update configuration
+# - Preserve your customizations
+# - Install missing components
+```
+
+### After Migration
+
+1. **Verify installation**:
+```bash
+zsc status
+
+# Test core functionality
+zsh -c 'echo $ZSH_VERSION'
+starship --version
+tmux -V
+```
+
+2. **Test themes**:
+```bash
+# List available themes
+zsc theme --list
+
+# Apply a theme
+zsc theme nord
+
+# Test clipboard
+# Select text in tmux with mouse, press v to enter copy mode, press y to copy
+# Paste with p in normal mode
+```
+
+3. **Configuration sync**:
+```bash
+# Review your configuration
+zsc config --list
+
+# Adjust if needed
+zsc config --set preferences.autoUpdate false
+```
+
+## System Requirements
+
+### Minimum Requirements
+
+- **OS**: Linux or macOS
+- **Shell**: Zsh (bash and fish support planned)
+- **Node.js**: v14.0.0 or higher
+- **Package Manager**: npm, yarn, or pnpm
+- **Disk Space**: ~100 MB for installation
+- **Permissions**: Ability to install system packages
+
+### Supported Distributions
+
+- **Fedora**: 35+ ✅
+- **Ubuntu/Debian**: All LTS versions ✅
+- **Arch Linux**: Tested ✅
+- **WSL**: Full support with clipboard enhancements ✅
+
+### Optional Dependencies
+
+For enhanced features, the following are optional but recommended:
+
+- `git`: For version control and some features
+- `curl`: For downloading resources
+- `tmux`: For terminal multiplexing (optional but recommended)
+
+## Development
+
+### Project Structure
+
+```
+zsh-starship-config/
+├── bin/
+│   └── zsc.js              # Main CLI entry point
+├── src/
+│   ├── commands/              # Command handlers
+│   │   ├── install.js
+│   │   ├── update.js
+│   │   ├── status.js
+│   │   ├── theme.js
+│   │   ├── config.js
+│   │   ├── rollback.js
+│   │   └── backup.js
+│   └── utils/                 # Utility modules
+│       ├── logger.js           # Logging with spinners
+│       ├── error-handler.js    # Error handling & retry
+│       ├── config-manager.js    # Configuration persistence
+│       ├── component-manager.js # Component orchestration
+│       ├── downloader.js       # File downloads
+│       ├── backup.js          # Backup & restore
+│       ├── paths.js           # Path management
+│       └── system.js          # System detection
+├── data/
+│   ├── tmux.conf            # Tmux configuration
+│   ├── starship.toml         # Starship prompt config
+│   ├── themes.sh             # Tmux theme scripts
+│   ├── zshrc                # Zsh configuration
+│   └── ...                  # Other data files
+├── scripts/
+│   └── ...                  # Helper scripts
+├── tests/
+│   ├── setup.js             # Test setup utilities
+│   ├── logger.test.js        # Logger unit tests
+│   ├── error-handler.test.js # ErrorHandler unit tests
+│   ├── manual-test.js        # Manual CLI tests
+│   └── test-planning.md    # Test planning
+├── package.json
+├── jest.config.js
+└── README.md
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm test -- --coverage
+
+# Run specific test file
+npm test -- logger.test.js
+```
 
 ## Contributing
 
-Have improvements or suggestions? Feel free to modify the configuration!
+### Development Setup
+
+```bash
+# Clone repository
+git clone https://github.com/Jaggerxtrm/zsh-starship-config.git
+cd zsh-starship-config
+
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Link for development
+npm link
+```
+
+### Code Style
+
+- Use consistent formatting
+- Follow existing patterns
+- Add tests for new features
+- Update documentation
+
+### Submitting Changes
+
+1. Create feature branch: `git checkout -b feature/your-feature`
+2. Make changes and test: `npm test`
+3. Commit changes: `git commit -m "feat: your feature"`
+4. Push to GitHub: `git push origin feature/your-feature`
+5. Create Pull Request
 
 ## License
 
-Free and open-source configuration. Use and modify as you please!
+MIT License - Free to use and modify
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and changes.
+
+## Support
+
+- **GitHub Issues**: https://github.com/Jaggerxtrm/zsh-starship-config/issues
+- **Documentation**: https://github.com/Jaggerxtrm/zsh-starship-config/wiki
+- **Discussions**: https://github.com/Jaggerxtrm/zsh-starship-config/discussions
+
+## Acknowledgments
+
+- **Starship**: https://starship.rs
+- **Oh My Zsh**: https://ohmyz.sh/
+- **Tmux**: https://github.com/tmux/tmux-wiki
+- **Nerd Fonts**: https://www.nerdfonts.com/
+- **Tmux-yank**: https://github.com/tmux-plugins/tmux-yank
 
 ---
 
-**Created for a more productive and pleasant development experience**
+**Built with ❤️ for the developer community**
