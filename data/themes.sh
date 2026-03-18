@@ -155,6 +155,51 @@ apply_theme() {
             ;;
 
         # --- ADAPTIVE (Works on light AND dark backgrounds) ---
+
+        # --- LBLUE (Bright Blue for Light Backgrounds) ---
+        lblue)
+            _set  status-style               'bg=#e6f2ff,fg=#1e5aa8'
+            _set  window-status-style        'bg=#e6f2ff,fg=#5a8ac8'
+            _set  window-status-current-style 'bg=#e6f2ff,fg=#1e5aa8,bold'
+            _setw window-style               'bg=#e6f2ff,fg=#7a9ac8'
+            _setw window-active-style        'bg=#e6f2ff,fg=#0d3a6e'
+            _setw pane-border-style          'fg=#c8d8f0,bg=#e6f2ff'
+            _setw pane-active-border-style   'fg=#1e5aa8,bg=#e6f2ff'
+            ;;
+
+        # --- LGREEN (Bright Green for Light Backgrounds) ---
+        lgreen)
+            _set  status-style               'bg=#e6f8e6,fg=#2d6e2d'
+            _set  window-status-style        'bg=#e6f8e6,fg=#5a9a5a'
+            _set  window-status-current-style 'bg=#e6f8e6,fg=#2d6e2d,bold'
+            _setw window-style               'bg=#e6f8e6,fg=#7aaa7a'
+            _setw window-active-style        'bg=#e6f8e6,fg=#1a4a1a'
+            _setw pane-border-style          'fg=#c8e8c8,bg=#e6f8e6'
+            _setw pane-active-border-style   'fg=#2d6e2d,bg=#e6f8e6'
+            ;;
+
+        # --- LORANGE (Bright Orange for Light Backgrounds) ---
+        lorange)
+            _set  status-style               'bg=#fff4e6,fg=#c66a00'
+            _set  window-status-style        'bg=#fff4e6,fg=#d89850'
+            _set  window-status-current-style 'bg=#fff4e6,fg=#c66a00,bold'
+            _setw window-style               'bg=#fff4e6,fg=#e0b880'
+            _setw window-active-style        'bg=#fff4e6,fg=#8a4500'
+            _setw pane-border-style          'fg=#f0e0d0,bg=#fff4e6'
+            _setw pane-active-border-style   'fg=#c66a00,bg=#fff4e6'
+            ;;
+
+        # --- LRED (Bright Red for Light Backgrounds) ---
+        lred)
+            _set  status-style               'bg=#ffe6e6,fg=#c62020'
+            _set  window-status-style        'bg=#ffe6e6,fg=#d86060'
+            _set  window-status-current-style 'bg=#ffe6e6,fg=#c62020,bold'
+            _setw window-style               'bg=#ffe6e6,fg=#e09090'
+            _setw window-active-style        'bg=#ffe6e6,fg=#8a1010'
+            _setw pane-border-style          'fg=#f0d8d8,bg=#ffe6e6'
+            _setw pane-active-border-style   'fg=#c62020,bg=#ffe6e6'
+            ;;
+
         adaptive|auto)
             _set  status-style               'bg=default,fg=brightblack'
             _set  window-status-style        'bg=default,fg=brightblack'
@@ -167,7 +212,7 @@ apply_theme() {
 
         *)
             echo "Unknown theme: $theme"
-            echo "Available: cobalt, green, blue, purple, orange, red, nord, everforest, gruvbox, cream, gray, lightgray, adaptive"
+            echo "Available: cobalt, green, blue, lblue, lgreen, lorange, lred, purple, orange, red, nord, everforest, gruvbox, cream, gray, lightgray, adaptive"
             return 1
             ;;
     esac
