@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.1.2 - 2026-05-08
+
+### Bug Fixes
+
+- **tmux clipboard**: preserve Wayland clipboard environment (`WAYLAND_DISPLAY`, `XDG_RUNTIME_DIR`, `DBUS_SESSION_BUS_ADDRESS`) for long-lived/restored tmux servers so `wl-copy` keeps working.
+- **tmux mouse copy**: bind mouse drag, double-click, triple-click, `y`, and `Enter` directly to `wl-copy` so selections do not vanish when tmux-yank reload/restore drops the pipe command.
+
 ## v3.1.0 - 2026-03-09
 
 ### `zsc` CLI
