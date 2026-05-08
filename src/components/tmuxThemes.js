@@ -29,6 +29,11 @@ async function installTmuxThemes(configManager, logger, options = {}) {
     await copyFromData(options.scriptDir, 'git-pane-status.sh', path.join(scriptsDir, 'git-pane-status.sh'), logger, { executable: true, backup: true });
   }
 
+  const copyToClipboard = path.join(options.scriptDir, 'data', 'copy-to-clipboard.sh');
+  if (await fs.pathExists(copyToClipboard)) {
+    await copyFromData(options.scriptDir, 'copy-to-clipboard.sh', path.join(scriptsDir, 'copy-to-clipboard.sh'), logger, { executable: true, backup: true });
+  }
+
   const themesDoc = path.join(options.scriptDir, 'data', 'THEMES.md');
   if (await fs.pathExists(themesDoc)) {
     await copyFromData(options.scriptDir, 'THEMES.md', path.join(tmuxDir, 'THEMES.md'), logger, { backup: true });

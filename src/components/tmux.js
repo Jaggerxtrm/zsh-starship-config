@@ -31,6 +31,14 @@ async function installTmux(configManager, logger, options = {}) {
   }
   await fs.writeFile(destination, rendered, 'utf8');
 
+  const copyHelperSource = path.join(options.scriptDir, 'data', 'copy-to-clipboard.sh');
+  if (await fs.pathExists(copyHelperSource)) {
+    const copyHelperDestination = homePath('.tmux', 'scripts', 'copy-to-clipboard.sh');
+    await fs.ensureDir(path.dirname(copyHelperDestination));
+    await fs.copy(copyHelperSource, copyHelperDestination, { overwrite: true });
+    await fs.chmod(copyHelperDestination, 0o755);
+  }
+
   return { success: true };
 }
 

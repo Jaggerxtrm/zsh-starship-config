@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.1.3 - 2026-05-08
+
+### Bug Fixes
+
+- **tmux clipboard over SSH/VPS**: replace hard-coded `wl-copy` copy-mode bindings with a portable `copy-to-clipboard.sh` helper. It uses local Wayland/X11/macOS/WSL clipboard tools when available and falls back to tmux OSC52 (`load-buffer -w`) for remote/headless servers.
+
 ## v4.1.2 - 2026-05-08
 
 ### Bug Fixes
