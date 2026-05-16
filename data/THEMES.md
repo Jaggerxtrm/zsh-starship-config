@@ -4,7 +4,7 @@ Graphite-based, eye-friendly theme system with consistent visual hierarchy.
 
 ## Design Principles
 
-- **Neutral text layer** across all themes (no pure white/black)
+- **Neutral text layer** across most themes; `black` intentionally uses true `#000000`
 - **Accent colors** reserved for borders/highlights only
 - **Consistent contrast** hierarchy:
   - Primary text = readable
@@ -34,15 +34,18 @@ Graphite-based, eye-friendly theme system with consistent visual hierarchy.
 
 ## Accent Colors
 
+The revised blue/red/purple accents follow the familiar xterm/ANSI defaults many terminal screenshots inherit: blue `#0000ff`, red `#cd0000`, magenta/purple `#cd00cd`. The colored themes now keep neutral backgrounds and use color only for active borders.
+
 | Theme | Accent | Best For |
 |-------|--------|----------|
+| `black` | `#000000` background | Total/true black terminal look |
 | `graphite` | `#6f767d` (neutral) | **Default dark**, general use |
 | `cobalt` | `#5f87a8` | Alternative neutral |
-| `green` | `#282c33` background, `#98c379` accent | Coding, development, AI |
-| `blue` | `#7aa2d2` | Research, learning |
-| `purple` | `#b294d2` | Creative, writing |
+| `green` | `#98c379` | Coding, development, AI |
+| `blue` | `#0000ff` | Research, learning; familiar ANSI/xterm blue |
+| `purple` | `#cd00cd` | Creative, writing; familiar ANSI/xterm magenta |
 | `orange` | `#d7a65f` | Testing, debugging |
-| `red` | `#d38686` | Production, urgent |
+| `red` | `#cd0000` | Production, urgent; familiar ANSI/xterm red |
 | `nord` | `#88c0d0` | Arctic, minimal |
 | `everforest` | `#a7c080` | Nature-inspired |
 | `gruvbox` | `#fabd2f` | Warm retro |
@@ -74,8 +77,8 @@ Graphite-based, eye-friendly theme system with consistent visual hierarchy.
 
 ### Dark Themes (10)
 ```
-graphite  cobalt  green  blue  purple
-orange    red     nord   everforest  gruvbox
+black    graphite  cobalt  green  blue
+purple   orange   red     nord   everforest  gruvbox
 ```
 
 ### Light Themes (10)
@@ -91,6 +94,7 @@ lorange  lred      lnord     leverforest  lgruvbox
 | Session Keywords | Theme |
 |------------------|-------|
 | `code`, `dev`, `coding`, `claude`, `qwen`, `ai` | green/code (`#282c33`) |
+| `black`, `trueblack`, `totalblack` | black |
 | `research`, `learn`, `study`, `doc`, `read` | blue |
 | `creative`, `write`, `note`, `idea`, `brain` | purple |
 | `test`, `debug`, `spec`, `check` | orange |

@@ -20,6 +20,11 @@ SESSION_LOWER=$(echo "$SESSION" | tr '[:upper:]' '[:lower:]')
 THEME="graphite"  # default dark
 
 case "$SESSION_LOWER" in
+    # Black theme - Total/true black
+    *total-black*|*totalblack*|*true-black*|*trueblack*|*black*)
+        THEME="black"
+        ;;
+
     # Green themes - Development/Coding
     *code*|*dev*|*coding*|*claude*|*qwen*|*ai*)
         THEME="green"

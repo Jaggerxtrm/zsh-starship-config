@@ -34,6 +34,19 @@ apply_theme() {
         # DARK THEMES
         # ============================================
 
+        # --- BLACK / TOTAL BLACK (True terminal black) ---
+        black|totalblack|total-black|trueblack|true-black)
+            # Background: #000000
+            _set  status-style               'fg=#d0d0d0,bg=#000000'
+            _set  window-status-style        'fg=#808080,bg=#000000'
+            _set  window-status-current-style 'fg=#ffffff,bg=#000000,bold'
+            _setw window-style               'fg=#808080,bg=#000000'
+            _setw window-active-style        'fg=#d0d0d0,bg=#000000'
+            _setw pane-border-style          'fg=#202020,bg=#000000'
+            _setw pane-active-border-style   'fg=#ffffff,bg=#000000'
+            _set  message-style              'fg=#ffffff,bg=#101010'
+            ;;
+
         # --- GRAPHITE (DEFAULT DARK - Neutral Accent) ---
         graphite|default|dark|"")
             # Background: #141414
@@ -73,30 +86,30 @@ apply_theme() {
             _set  message-style              'fg=#c6cacf,bg=#222222'
             ;;
 
-        # --- BLUE (Research/Learning - Accent: #7aa2d2) ---
+        # --- BLUE (Research/Learning - xterm/iTerm-like Accent: #0000ff) ---
         blue|research|learning)
-            # Background: #181d26
-            _set  status-style               'fg=#b8bcc0,bg=#181d26'
-            _set  window-status-style        'fg=#8a8f94,bg=#181d26'
-            _set  window-status-current-style 'fg=#c6cacf,bg=#181d26,bold'
-            _setw window-style               'fg=#8a8f94,bg=#181d26'
-            _setw window-active-style        'fg=#b8bcc0,bg=#181d26'
-            _setw pane-border-style          'fg=#2a2a2a,bg=#181d26'
-            _setw pane-active-border-style   'fg=#7aa2d2,bg=#181d26'
-            _set  message-style              'fg=#c6cacf,bg=#232323'
+            # Background: neutral dark #141414; accent uses familiar terminal ANSI blue
+            _set  status-style               'fg=#b8bcc0,bg=#141414'
+            _set  window-status-style        'fg=#8a8f94,bg=#141414'
+            _set  window-status-current-style 'fg=#c6cacf,bg=#141414,bold'
+            _setw window-style               'fg=#8a8f94,bg=#141414'
+            _setw window-active-style        'fg=#b8bcc0,bg=#141414'
+            _setw pane-border-style          'fg=#303030,bg=#141414'
+            _setw pane-active-border-style   'fg=#0000ff,bg=#141414'
+            _set  message-style              'fg=#c6cacf,bg=#222222'
             ;;
 
-        # --- PURPLE (Creative/Writing - Accent: #b294d2) ---
+        # --- PURPLE (Creative/Writing - xterm/iTerm-like Magenta Accent: #cd00cd) ---
         purple|creative|writing)
-            # Background: #201824
-            _set  status-style               'fg=#b8bcc0,bg=#201824'
-            _set  window-status-style        'fg=#8a8f94,bg=#201824'
-            _set  window-status-current-style 'fg=#c6cacf,bg=#201824,bold'
-            _setw window-style               'fg=#8a8f94,bg=#201824'
-            _setw window-active-style        'fg=#b8bcc0,bg=#201824'
-            _setw pane-border-style          'fg=#2a2a2a,bg=#201824'
-            _setw pane-active-border-style   'fg=#b294d2,bg=#201824'
-            _set  message-style              'fg=#c6cacf,bg=#252525'
+            # Background: neutral dark #141414; accent uses familiar terminal ANSI magenta
+            _set  status-style               'fg=#b8bcc0,bg=#141414'
+            _set  window-status-style        'fg=#8a8f94,bg=#141414'
+            _set  window-status-current-style 'fg=#c6cacf,bg=#141414,bold'
+            _setw window-style               'fg=#8a8f94,bg=#141414'
+            _setw window-active-style        'fg=#b8bcc0,bg=#141414'
+            _setw pane-border-style          'fg=#303030,bg=#141414'
+            _setw pane-active-border-style   'fg=#cd00cd,bg=#141414'
+            _set  message-style              'fg=#c6cacf,bg=#222222'
             ;;
 
         # --- ORANGE (Testing/Debugging - Accent: #d7a65f) ---
@@ -112,17 +125,17 @@ apply_theme() {
             _set  message-style              'fg=#c6cacf,bg=#262626'
             ;;
 
-        # --- RED (Production/Urgent - Accent: #d38686) ---
+        # --- RED (Production/Urgent - xterm/iTerm-like Accent: #cd0000) ---
         red|prod|urgent)
-            # Background: #241717
-            _set  status-style               'fg=#b8bcc0,bg=#241717'
-            _set  window-status-style        'fg=#8a8f94,bg=#241717'
-            _set  window-status-current-style 'fg=#c6cacf,bg=#241717,bold'
-            _setw window-style               'fg=#8a8f94,bg=#241717'
-            _setw window-active-style        'fg=#b8bcc0,bg=#241717'
-            _setw pane-border-style          'fg=#2a2a2a,bg=#241717'
-            _setw pane-active-border-style   'fg=#d38686,bg=#241717'
-            _set  message-style              'fg=#c6cacf,bg=#282828'
+            # Background: neutral dark #141414; accent uses familiar terminal ANSI red
+            _set  status-style               'fg=#b8bcc0,bg=#141414'
+            _set  window-status-style        'fg=#8a8f94,bg=#141414'
+            _set  window-status-current-style 'fg=#c6cacf,bg=#141414,bold'
+            _setw window-style               'fg=#8a8f94,bg=#141414'
+            _setw window-active-style        'fg=#b8bcc0,bg=#141414'
+            _setw pane-border-style          'fg=#303030,bg=#141414'
+            _setw pane-active-border-style   'fg=#cd0000,bg=#141414'
+            _set  message-style              'fg=#c6cacf,bg=#222222'
             ;;
 
         # --- NORD (Accent: #88c0d0) ---
@@ -207,30 +220,30 @@ apply_theme() {
             _set  message-style              'fg=#2f3336,bg=#e4ece6'
             ;;
 
-        # --- LBLUE (Accent: #7aa2d2) ---
+        # --- LBLUE (xterm/iTerm-like Accent: #0000ff) ---
         lblue)
-            # Background: #edf4fb
-            _set  status-style               'fg=#3f4347,bg=#edf4fb'
-            _set  window-status-style        'fg=#7a8086,bg=#edf4fb'
-            _set  window-status-current-style 'fg=#2f3336,bg=#edf4fb,bold'
-            _setw window-style               'fg=#7a8086,bg=#edf4fb'
-            _setw window-active-style        'fg=#3f4347,bg=#edf4fb'
-            _setw pane-border-style          'fg=#d2d6da,bg=#edf4fb'
-            _setw pane-active-border-style   'fg=#7aa2d2,bg=#edf4fb'
-            _set  message-style              'fg=#2f3336,bg=#e4ebf2'
+            # Background: neutral paper #f3f3f1; accent uses familiar terminal ANSI blue
+            _set  status-style               'fg=#3f4347,bg=#f3f3f1'
+            _set  window-status-style        'fg=#7a8086,bg=#f3f3f1'
+            _set  window-status-current-style 'fg=#2f3336,bg=#f3f3f1,bold'
+            _setw window-style               'fg=#7a8086,bg=#f3f3f1'
+            _setw window-active-style        'fg=#3f4347,bg=#f3f3f1'
+            _setw pane-border-style          'fg=#d2d6da,bg=#f3f3f1'
+            _setw pane-active-border-style   'fg=#0000ff,bg=#f3f3f1'
+            _set  message-style              'fg=#2f3336,bg=#e6e6e2'
             ;;
 
-        # --- LPURPLE (Accent: #b294d2) ---
+        # --- LPURPLE (xterm/iTerm-like Magenta Accent: #cd00cd) ---
         lpurple)
-            # Background: #f5eff8
-            _set  status-style               'fg=#3f4347,bg=#f5eff8'
-            _set  window-status-style        'fg=#7a8086,bg=#f5eff8'
-            _set  window-status-current-style 'fg=#2f3336,bg=#f5eff8,bold'
-            _setw window-style               'fg=#7a8086,bg=#f5eff8'
-            _setw window-active-style        'fg=#3f4347,bg=#f5eff8'
-            _setw pane-border-style          'fg=#d2d6da,bg=#f5eff8'
-            _setw pane-active-border-style   'fg=#b294d2,bg=#f5eff8'
-            _set  message-style              'fg=#2f3336,bg=#ece5f0'
+            # Background: neutral paper #f3f3f1; accent uses familiar terminal ANSI magenta
+            _set  status-style               'fg=#3f4347,bg=#f3f3f1'
+            _set  window-status-style        'fg=#7a8086,bg=#f3f3f1'
+            _set  window-status-current-style 'fg=#2f3336,bg=#f3f3f1,bold'
+            _setw window-style               'fg=#7a8086,bg=#f3f3f1'
+            _setw window-active-style        'fg=#3f4347,bg=#f3f3f1'
+            _setw pane-border-style          'fg=#d2d6da,bg=#f3f3f1'
+            _setw pane-active-border-style   'fg=#cd00cd,bg=#f3f3f1'
+            _set  message-style              'fg=#2f3336,bg=#e6e6e2'
             ;;
 
         # --- LORANGE (Accent: #d7a65f) ---
@@ -246,17 +259,17 @@ apply_theme() {
             _set  message-style              'fg=#2f3336,bg=#f2e8dc'
             ;;
 
-        # --- LRED (Accent: #d38686) ---
+        # --- LRED (xterm/iTerm-like Accent: #cd0000) ---
         lred)
-            # Background: #fbebeb
-            _set  status-style               'fg=#3f4347,bg=#fbebeb'
-            _set  window-status-style        'fg=#7a8086,bg=#fbebeb'
-            _set  window-status-current-style 'fg=#2f3336,bg=#fbebeb,bold'
-            _setw window-style               'fg=#7a8086,bg=#fbebeb'
-            _setw window-active-style        'fg=#3f4347,bg=#fbebeb'
-            _setw pane-border-style          'fg=#d2d6da,bg=#fbebeb'
-            _setw pane-active-border-style   'fg=#d38686,bg=#fbebeb'
-            _set  message-style              'fg=#2f3336,bg=#f2dddd'
+            # Background: neutral paper #f3f3f1; accent uses familiar terminal ANSI red
+            _set  status-style               'fg=#3f4347,bg=#f3f3f1'
+            _set  window-status-style        'fg=#7a8086,bg=#f3f3f1'
+            _set  window-status-current-style 'fg=#2f3336,bg=#f3f3f1,bold'
+            _setw window-style               'fg=#7a8086,bg=#f3f3f1'
+            _setw window-active-style        'fg=#3f4347,bg=#f3f3f1'
+            _setw pane-border-style          'fg=#d2d6da,bg=#f3f3f1'
+            _setw pane-active-border-style   'fg=#cd0000,bg=#f3f3f1'
+            _set  message-style              'fg=#2f3336,bg=#e6e6e2'
             ;;
 
         # --- LNORD (Accent: #88c0d0) ---
@@ -302,8 +315,8 @@ apply_theme() {
             echo "Unknown theme: $theme"
             echo ""
             echo "Dark themes:"
-            echo "  graphite (default), cobalt, green, blue, purple"
-            echo "  orange, red, nord, everforest, gruvbox"
+            echo "  black, graphite (default), cobalt, green, blue"
+            echo "  purple, orange, red, nord, everforest, gruvbox"
             echo ""
             echo "Light themes:"
             echo "  paper (default light), lcobalt, lgreen, lblue"
