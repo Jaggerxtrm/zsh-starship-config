@@ -34,18 +34,18 @@ Graphite-based, eye-friendly theme system with consistent visual hierarchy.
 
 ## Accent Colors
 
-The revised blue/red/purple accents follow the familiar xterm/ANSI defaults many terminal screenshots inherit: blue `#0000ff`, red `#cd0000`, magenta/purple `#cd00cd`. The colored themes now keep neutral backgrounds and use color only for active borders.
+The revised blue/red/purple themes use visibly colored backgrounds with brighter active borders, while keeping familiar terminal/xterm color direction: blue, red, and magenta/purple.
 
 | Theme | Accent | Best For |
 |-------|--------|----------|
-| `black` | `#000000` background | Total/true black terminal look |
+| `black` | `#000000` background, `#242424` active border | Total/true black terminal look with no colored accent |
 | `graphite` | `#6f767d` (neutral) | **Default dark**, general use |
 | `cobalt` | `#5f87a8` | Alternative neutral |
 | `green` | `#98c379` | Coding, development, AI |
-| `blue` | `#0000ff` | Research, learning; familiar ANSI/xterm blue |
-| `purple` | `#cd00cd` | Creative, writing; familiar ANSI/xterm magenta |
+| `blue` | `#0b2a5b` background, `#5c9cff` accent | Research, learning; visible blue |
+| `purple` | `#32104d` background, `#d56bff` accent | Creative, writing; visible purple |
 | `orange` | `#d7a65f` | Testing, debugging |
-| `red` | `#cd0000` | Production, urgent; familiar ANSI/xterm red |
+| `red` | `#4a1010` background, `#ff5c5c` accent | Production, urgent; visible red |
 | `nord` | `#88c0d0` | Arctic, minimal |
 | `everforest` | `#a7c080` | Nature-inspired |
 | `gruvbox` | `#fabd2f` | Warm retro |
